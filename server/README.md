@@ -28,6 +28,20 @@ Backend completo para el Sistema de Punto de Venta desarrollado con Node.js, Exp
 - **MongoDB** v6+
 - **npm** o **yarn**
 
+## 🚀 INICIO RÁPIDO
+
+**¿Primera vez? Sigue esta guía completa:** [GUIA_INICIO_BACKEND.md](/GUIA_INICIO_BACKEND.md)
+
+**Comandos rápidos:**
+```bash
+cd server
+npm install
+npm run quick-check    # Verificar estructura
+npm run check-config   # Verificar configuración
+npm run check-mongo    # Verificar MongoDB
+npm run dev            # Iniciar servidor
+```
+
 ---
 
 ## 🔧 Instalación
