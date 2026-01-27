@@ -1,0 +1,33 @@
+{
+  "name": "pos-backend",
+  "version": "1.0.0",
+  "description": "Backend para Sistema POS con MongoDB",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "verify": "node src/scripts/verifySystem.js",
+    "audit": "node src/scripts/auditBackend.js",
+    "seed:users": "node src/scripts/seedUsers.js",
+    "seed:recharges": "node src/scripts/seedRecharges.js",
+    "seed:services": "node src/scripts/seedServices.js",
+    "seed:all": "npm run seed:users && npm run seed:recharges && npm run seed:services"
+  },
+  "keywords": ["pos", "mongodb", "express"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^8.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "express-validator": "^7.0.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
