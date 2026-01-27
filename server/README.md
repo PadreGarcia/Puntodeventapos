@@ -30,16 +30,37 @@ Backend completo para el Sistema de Punto de Venta desarrollado con Node.js, Exp
 
 ## 🚀 INICIO RÁPIDO
 
-**¿Primera vez? Sigue esta guía completa:** [GUIA_INICIO_BACKEND.md](/GUIA_INICIO_BACKEND.md)
+### ⚡ Primera Vez (Configuración Completa)
 
-**Comandos rápidos:**
 ```bash
 cd server
-npm install
-npm run quick-check    # Verificar estructura
-npm run check-config   # Verificar configuración
-npm run check-mongo    # Verificar MongoDB
-npm run dev            # Iniciar servidor
+npm install           # Instalar dependencias
+npm run setup         # Configuración inicial completa
+npm run seed          # Insertar datos de ejemplo (usuarios + productos)
+npm run dev           # Iniciar servidor
+```
+
+**Credenciales:** `admin` / `admin123`
+
+### 🔄 Uso Diario
+
+```bash
+npm run dev           # Iniciar servidor
+```
+
+### 📖 Guías Detalladas
+
+- **[INICIO_RAPIDO.md](INICIO_RAPIDO.md)** - Guía paso a paso (5 minutos)
+- **[SEED_README.md](SEED_README.md)** - Documentación de datos iniciales
+- **[GUIA_INICIO_BACKEND.md](/GUIA_INICIO_BACKEND.md)** - Guía completa
+
+### 🛠️ Comandos de Verificación
+
+```bash
+npm run quick-check    # Verificación rápida del sistema
+npm run check-config   # Verificar configuración (.env)
+npm run check-mongo    # Verificar conexión a MongoDB
+npm run check-db       # Ver contenido de la base de datos
 ```
 
 ---
@@ -351,21 +372,29 @@ server/
 ## 🛠️ Scripts NPM
 
 ```bash
-# Desarrollo
+# ⚡ Configuración Inicial
+npm run setup            # Configuración inicial automática
+npm run setup:clean      # Limpiar BD y reconfigurar
+
+# 🌱 Insertar Datos (Seeds)
+npm run seed             # Insertar datos iniciales (usuarios + productos)
+npm run seed:clean       # Limpiar BD y volver a insertar
+npm run seed:users       # Poblar solo usuarios
+npm run seed:recharges   # Poblar solo recargas
+npm run seed:services    # Poblar solo servicios
+npm run seed:all         # Poblar todo
+
+# 🚀 Desarrollo
 npm run dev              # Iniciar con nodemon (auto-reload)
+npm start                # Iniciar servidor (producción)
 
-# Producción
-npm start                # Iniciar servidor
-
-# Verificación
+# 🔍 Verificación
+npm run quick-check      # Verificación rápida del sistema
+npm run check-config     # Verificar configuración (.env)
+npm run check-mongo      # Verificar conexión a MongoDB
+npm run check-db         # Ver contenido de la base de datos
 npm run verify           # Verificar sistema completo
 npm run audit            # Auditar coherencia del backend
-
-# Seeds
-npm run seed:users       # Poblar usuarios
-npm run seed:recharges   # Poblar recargas
-npm run seed:services    # Poblar servicios
-npm run seed:all         # Poblar todo
 ```
 
 ---
