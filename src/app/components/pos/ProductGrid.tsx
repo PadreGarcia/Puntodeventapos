@@ -12,8 +12,14 @@ export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   // Obtener categorías únicas (sin duplicar 'all')
-  const uniqueCategories = Array.from(new Set(products.map(p => p.category)));
-  const categories = ['all', ...uniqueCategories.filter(cat => cat !== 'all')];
+  const uniqueCategories = Array.from(
+    new Set(
+      products
+        .map(p => p.category)
+        .filter(cat => typeof cat === 'string' && cat.trim() !== '' && cat !== 'all')
+    )
+  );
+  const categories = ['all', ...uniqueCategories];
 
   // Filtrar productos
   const filteredProducts = products.filter(product => {
@@ -42,9 +48,9 @@ export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
           {/* Filtro de categorías */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
             <Filter className="w-4 h-4 text-[#EC0000] flex-shrink-0" />
-            {categories.map(category => (
+            {categories.map((category, index) => (
               <button
-                key={category}
+                key={`category-${category}-${index}`}
                 onClick={() => setSelectedCategory(category)}
                 className={`px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
                   selectedCategory === category
