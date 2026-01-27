@@ -39,30 +39,56 @@ cd server
 npm install
 ```
 
-### 2. Configurar variables de entorno
+### 2. Configurar variables de entorno ⚠️ IMPORTANTE
 
-Copia el archivo de ejemplo y configura tus variables:
+**El archivo `.env` YA está creado con valores por defecto.** 
+
+Si necesitas modificar algo (por ejemplo, usar MongoDB Atlas en lugar de local):
 
 ```bash
-cp .env.example .env
+# Edita el archivo .env
+nano .env
+# o
+code .env
 ```
 
-Edita el archivo `.env` con tus configuraciones:
+**Configuración por defecto:**
 
 ```env
-# MongoDB
-MONGODB_URI=mongodb://localhost:27017/pos-santander
+# MongoDB Local
+MONGODB_URI=mongodb://localhost:27017/pos_santander
 
 # Puerto del servidor
 PORT=5000
 
-# JWT
-JWT_SECRET=tu_clave_secreta_jwt_aqui
-JWT_EXPIRE=7d
+# JWT (CAMBIAR EN PRODUCCIÓN)
+JWT_SECRET=tu_clave_secreta_super_segura_aqui_cambiar_en_produccion_123456
+JWT_EXPIRES_IN=7d
 
 # Entorno
 NODE_ENV=development
 ```
+
+**Para MongoDB Atlas (nube):**
+
+```env
+MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/pos_santander?retryWrites=true&w=majority
+```
+
+### 2.1 Verificar configuración
+
+Antes de iniciar, verifica que todo esté bien configurado:
+
+```bash
+npm run check-config
+```
+
+Este comando verificará:
+- ✅ Que el archivo .env exista
+- ✅ Que todas las variables requeridas estén definidas
+- ✅ Que MONGODB_URI esté correctamente formateada
+- ✅ Que JWT_SECRET sea seguro
+- ✅ Configuración de red y puerto
 
 ### 3. Iniciar MongoDB
 
@@ -332,18 +358,78 @@ npm run seed:all         # Poblar todo
 
 ## 🐛 Troubleshooting
 
+### ❌ Error: MONGODB_URI is undefined
+
+**Causa:** El archivo `.env` no existe o no se está cargando correctamente.
+
+**Solución:**
+1. Verifica que el archivo `/server/.env` exista:
+   ```bash
+   ls -la /server/.env
+   ```
+
+2. Si no existe, ya está creado automáticamente. Si lo borraste, créalo de nuevo:
+   ```bash
+   cp /server/.env.example /server/.env
+   ```
+
+3. Verifica que el contenido sea correcto:
+   ```bash
+   cat /server/.env | grep MONGODB_URI
+   ```
+
+4. Debe mostrar algo como:
+   ```
+   MONGODB_URI=mongodb://localhost:27017/pos_santander
+   ```
+
+5. Ejecuta la verificación:
+   ```bash
+   npm run check-config
+   ```
+
 ### Error: Cannot connect to MongoDB
 
 **Solución:**
-1. Verifica que MongoDB esté corriendo: `mongod --version`
-2. Verifica la URI en `.env`: `MONGODB_URI=mongodb://localhost:27017/pos-santander`
-3. Intenta conectar manualmente: `mongosh`
+1. Verifica que MongoDB esté corriendo: 
+   ```bash
+   mongod --version
+   ```
+
+2. Inicia MongoDB si no está corriendo:
+   ```bash
+   # macOS
+   brew services start mongodb-community
+   
+   # Linux
+   sudo systemctl start mongod
+   
+   # Windows
+   mongod
+   ```
+
+3. Verifica la URI en `.env`: 
+   ```bash
+   cat /server/.env | grep MONGODB_URI
+   ```
+
+4. Intenta conectar manualmente: 
+   ```bash
+   mongosh
+   ```
 
 ### Error: JWT_SECRET not defined
 
 **Solución:**
-1. Copia `.env.example` a `.env`
-2. Define tu `JWT_SECRET` en `.env`
+1. El archivo `.env` ya tiene JWT_SECRET configurado
+2. Si no existe, verifica:
+   ```bash
+   cat /server/.env | grep JWT_SECRET
+   ```
+3. Ejecuta:
+   ```bash
+   npm run check-config
+   ```
 
 ### Error: Port 5000 already in use
 

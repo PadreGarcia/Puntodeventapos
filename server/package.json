@@ -7,6 +7,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "check-config": "node src/scripts/check-config.js",
+    "check-mongo": "node src/scripts/check-mongodb.js",
     "verify": "node src/scripts/verifySystem.js",
     "audit": "node src/scripts/auditBackend.js",
     "seed:users": "node src/scripts/seedUsers.js",
