@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { ShoppingCart, Package, Box, X, ShoppingBag, ChevronLeft, ChevronRight, Wallet, BarChart3, Users, Percent, Home, Settings, LogOut, Shield, Smartphone, Receipt } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
-import { LoginScreen } from '@/app/components/auth/LoginScreen';
+import { LoginScreenWithAPI } from '@/app/components/auth/LoginScreenWithAPI';
 import { SessionLockScreen } from '@/app/components/auth/SessionLockScreen';
 import { DashboardView } from '@/app/components/dashboard/DashboardView';
 import { UserManagement } from '@/app/components/admin/UserManagement';
@@ -27,6 +27,7 @@ import type { Product, CartItem, PaymentMethod, Sale, ShiftSummary, Customer, Us
 import { validateStockForCart, validateSaleStock, updateStockAfterSale } from '@/utils/stockValidation';
 import { hasPermission, canAccessModule, MODULES, getActionCriticality } from '@/utils/permissions';
 import { AccessDenied } from '@/app/components/common/AccessDenied';
+import { api } from '@/services/api';
 
 // Productos - inicialmente vacío
 const MOCK_PRODUCTS: Product[] = [];
@@ -160,8 +161,41 @@ export default function App() {
   };
 
   // Login con auditoría
-  const handleLogin = (user: User) => {
+  const handleLogin = async (user: User) => {
     setCurrentUser(user);
+    
+    // Cargar productos desde el backend
+    try {
+      const response = await api.getProducts();
+      if (response.success && response.data) {
+        setProducts(response.data);
+      }
+    } catch (error) {
+      console.error('Error cargando productos:', error);
+      toast.error('Error al cargar productos');
+    }
+
+    // Cargar clientes desde el backend
+    try {
+      const response = await api.getCustomers();
+      if (response.success && response.data) {
+        setCustomers(response.data);
+      }
+    } catch (error) {
+      console.error('Error cargando clientes:', error);
+    }
+
+    // Cargar usuarios desde el backend (solo para admins)
+    if (user.role === 'admin') {
+      try {
+        const response = await api.getUsers();
+        if (response.success && response.data) {
+          setUsers(response.data);
+        }
+      } catch (error) {
+        console.error('Error cargando usuarios:', error);
+      }
+    }
     
     // Crear turno automáticamente
     const newShift: ShiftSummary = {
@@ -787,7 +821,7 @@ export default function App() {
     return (
       <>
         <Toaster richColors closeButton />
-        <LoginScreen onLogin={handleLogin} users={users} />
+        <LoginScreenWithAPI onLoginSuccess={handleLogin} />
       </>
     );
   }
