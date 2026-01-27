@@ -341,7 +341,6 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
               </span>
               <div className="flex gap-1">
                 <button
-                  key={`qr-${product.id}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     onShowCode({ product, type: 'qr' });
@@ -352,7 +351,6 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
                   <QrCode className="w-4 h-4" />
                 </button>
                 <button
-                  key={`barcode-${product.id}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     onShowCode({ product, type: 'barcode' });
@@ -371,7 +369,6 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
             {/* Ajustar Inventario */}
             {onAdjustInventory && (
               <button
-                key={`inventory-${product.id}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   onAdjustInventory(product);
@@ -387,7 +384,6 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
             {/* Editar */}
             {canEdit && (
               <button
-                key={`edit-${product.id}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   onEdit(product);
@@ -403,7 +399,6 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
             {/* Eliminar */}
             {canDelete && (
               <button
-                key={`delete-${product.id}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete(product.id);
@@ -607,7 +602,6 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
                               <div className="flex items-center gap-2">
                                 <span className="font-mono text-sm text-gray-600">{product.barcode}</span>
                                 <button
-                                  key={`table-qr-${product.id}`}
                                   onClick={() => setShowCodeModal({ product, type: 'qr' })}
                                   className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                   title="Ver QR"
@@ -615,7 +609,6 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
                                   <QrCode className="w-4 h-4" />
                                 </button>
                                 <button
-                                  key={`table-barcode-${product.id}`}
                                   onClick={() => setShowCodeModal({ product, type: 'barcode' })}
                                   className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                                   title="Ver Código de Barras"
@@ -632,7 +625,6 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
                               {/* Ajustar Inventario */}
                               {onNavigateToInventory && (
                                 <button
-                                  key={`table-inventory-${product.id}`}
                                   onClick={() => handleAdjustInventory(product)}
                                   className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                                   title="Ajustar Inventario"
@@ -644,7 +636,6 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
                               {/* Editar */}
                               {canEdit && (
                                 <button
-                                  key={`table-edit-${product.id}`}
                                   onClick={() => handleOpenForm(product)}
                                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                   title="Editar"
@@ -656,7 +647,6 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
                               {/* Eliminar */}
                               {canDelete && (
                                 <button
-                                  key={`table-delete-${product.id}`}
                                   onClick={() => handleDelete(product.id)}
                                   className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                   title="Eliminar"

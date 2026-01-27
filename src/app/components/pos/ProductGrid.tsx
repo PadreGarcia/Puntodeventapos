@@ -75,9 +75,9 @@ export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-            {filteredProducts.map(product => (
+            {filteredProducts.map((product, index) => (
               <button
-                key={product.id}
+                key={`product-${product.id}-${index}`}
                 onClick={() => onAddToCart(product)}
                 disabled={product.stock === 0}
                 className={`group relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col min-h-[180px] ${

@@ -194,12 +194,12 @@ export function InventoryManagement({ products, onUpdateProducts, currentUser }:
 
           {/* Stock Actual y Mínimo */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-blue-50 rounded-lg p-3">
+            <div key={`current-stock-${product.id}`} className="bg-blue-50 rounded-lg p-3">
               <div className="text-xs text-blue-600 font-bold uppercase mb-1">Stock Actual</div>
               <div className="text-3xl font-bold text-blue-900">{product.stock}</div>
               <div className="text-xs text-blue-600">unidades</div>
             </div>
-            <div className="bg-gray-50 rounded-lg p-3">
+            <div key={`min-stock-${product.id}`} className="bg-gray-50 rounded-lg p-3">
               <div className="text-xs text-gray-600 font-bold uppercase mb-1">Stock Mín.</div>
               <div className="text-3xl font-bold text-gray-900">{product.minStock || 0}</div>
               <div className="text-xs text-gray-600">unidades</div>
