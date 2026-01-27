@@ -31,7 +31,7 @@ export function Cart({ items, onUpdateQuantity, onRemoveItem, isOpen, onClose, o
 
       {/* Panel del carrito */}
       <div className={`
-        fixed lg:relative top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50
+        fixed lg:relative top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 lg:z-auto
         flex flex-col transition-transform duration-300 lg:translate-x-0
         ${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
       `}>
@@ -91,15 +91,17 @@ export function Cart({ items, onUpdateQuantity, onRemoveItem, isOpen, onClose, o
                     <div className="flex items-center justify-between mt-auto pt-2">
                       <div className="flex items-center gap-2">
                         <button
+                          key={`minus-${item.product.id}`}
                           onClick={() => onUpdateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
                           className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors active:scale-95"
                         >
                           <Minus className="w-4 h-4" />
                         </button>
-                        <span className="w-10 text-center font-bold tabular-nums">
+                        <span key={`quantity-${item.product.id}`} className="w-10 text-center font-bold tabular-nums">
                           {item.quantity}
                         </span>
                         <button
+                          key={`plus-${item.product.id}`}
                           onClick={() => onUpdateQuantity(item.product.id, Math.min(item.product.stock, item.quantity + 1))}
                           disabled={item.quantity >= item.product.stock}
                           className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -109,6 +111,7 @@ export function Cart({ items, onUpdateQuantity, onRemoveItem, isOpen, onClose, o
                       </div>
 
                       <button
+                        key={`remove-${item.product.id}`}
                         onClick={() => onRemoveItem(item.product.id)}
                         className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                       >

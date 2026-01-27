@@ -80,7 +80,7 @@ export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
                 key={`product-${product.id}-${index}`}
                 onClick={() => onAddToCart(product)}
                 disabled={product.stock === 0}
-                className={`group relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col min-h-[180px] ${
+                className={`group relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col min-h-[180px] pointer-events-auto ${
                   product.stock === 0 
                     ? 'opacity-50 cursor-not-allowed' 
                     : 'hover:scale-[1.02] active:scale-[0.98] cursor-pointer'
