@@ -11,8 +11,9 @@ export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  // Obtener categorías únicas
-  const categories = ['all', ...Array.from(new Set(products.map(p => p.category)))];
+  // Obtener categorías únicas (sin duplicar 'all')
+  const uniqueCategories = Array.from(new Set(products.map(p => p.category)));
+  const categories = ['all', ...uniqueCategories.filter(cat => cat !== 'all')];
 
   // Filtrar productos
   const filteredProducts = products.filter(product => {

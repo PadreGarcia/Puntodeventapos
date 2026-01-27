@@ -957,26 +957,7 @@ class ApiService {
     });
   }
 
-  // Pagos de servicios
-  async createServicePayment(data: {
-    providerId: string;
-    reference: string;
-    accountName?: string;
-    amount: number;
-    customerPhone?: string;
-    customerEmail?: string;
-    paymentMethod: string;
-    receivedAmount?: number;
-    customerId?: string;
-    cashRegisterId?: string;
-    notes?: string;
-  }) {
-    return this.request<{ success: boolean; message: string; data: any }>('/services', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
-  }
-
+  // Pagos de servicios - método getAllServicePayments ya existe como getServicePayments arriba
   async getAllServicePayments(params?: {
     status?: string;
     provider_id?: string;
@@ -1084,43 +1065,8 @@ class ApiService {
     return this.request<{ success: boolean; data: any }>(`/users/${id}`);
   }
 
-  async createUser(data: {
-    username: string;
-    password: string;
-    fullName: string;
-    email?: string;
-    phone?: string;
-    role?: string;
-    permissions?: any[];
-    hireDate?: string;
-    department?: string;
-    salary?: number;
-    workSchedule?: any;
-    notes?: string;
-  }) {
-    return this.request<{ success: boolean; message: string; data: any }>('/users', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
-  }
-
-  async updateUser(id: string, data: {
-    fullName?: string;
-    email?: string;
-    phone?: string;
-    role?: string;
-    permissions?: any[];
-    department?: string;
-    salary?: number;
-    workSchedule?: any;
-    preferences?: any;
-    notes?: string;
-  }) {
-    return this.request<{ success: boolean; message: string; data: any }>(`/users/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data)
-    });
-  }
+  // createUser, updateUser y deleteUser ya existen arriba en las líneas 220-237
+  // Se removieron los duplicados para evitar conflictos
 
   async changePassword(id: string, currentPassword: string, newPassword: string) {
     return this.request<{ success: boolean; message: string }>(`/users/${id}/password`, {
@@ -1135,11 +1081,7 @@ class ApiService {
     });
   }
 
-  async deleteUser(id: string) {
-    return this.request<{ success: boolean; message: string }>(`/users/${id}`, {
-      method: 'DELETE'
-    });
-  }
+  // deleteUser ya existe arriba en la línea 234 - se removió el duplicado
 
   // Estadísticas y reportes de usuarios
   async getUserStats(id: string, params?: { date_from?: string; date_to?: string }) {
