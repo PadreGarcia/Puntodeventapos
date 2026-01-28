@@ -7,8 +7,8 @@ const router = express.Router();
 router.use(protect);
 
 router.get('/', getSuppliers);
-router.post('/', authorize('admin', 'supervisor'), createSupplier);
-router.put('/:id', authorize('admin', 'supervisor'), updateSupplier);
-router.delete('/:id', authorize('admin'), deleteSupplier);
+router.post('/', createSupplier); // Todos los usuarios autenticados pueden crear
+router.put('/:id', updateSupplier); // Todos los usuarios autenticados pueden actualizar
+router.delete('/:id', authorize('admin', 'supervisor'), deleteSupplier); // Solo admin y supervisor pueden eliminar
 
 export default router;

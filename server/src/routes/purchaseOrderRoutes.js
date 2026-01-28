@@ -20,16 +20,16 @@ router.get('/', getPurchaseOrders);
 // GET /api/purchase-orders/:id - Obtener orden por ID
 router.get('/:id', getPurchaseOrderById);
 
-// POST /api/purchase-orders - Crear orden (admin, supervisor)
-router.post('/', authorize(['admin', 'supervisor']), createPurchaseOrder);
+// POST /api/purchase-orders - Crear orden (todos los usuarios autenticados)
+router.post('/', createPurchaseOrder);
 
-// PUT /api/purchase-orders/:id - Actualizar orden (admin, supervisor)
-router.put('/:id', authorize(['admin', 'supervisor']), updatePurchaseOrder);
+// PUT /api/purchase-orders/:id - Actualizar orden (todos los usuarios autenticados)
+router.put('/:id', updatePurchaseOrder);
 
 // PATCH /api/purchase-orders/:id/status - Cambiar status (admin, supervisor)
 router.patch('/:id/status', authorize(['admin', 'supervisor']), updateOrderStatus);
 
-// DELETE /api/purchase-orders/:id - Eliminar orden (solo admin)
-router.delete('/:id', authorize(['admin']), deletePurchaseOrder);
+// DELETE /api/purchase-orders/:id - Eliminar orden (admin, supervisor)
+router.delete('/:id', authorize(['admin', 'supervisor']), deletePurchaseOrder);
 
 export default router;

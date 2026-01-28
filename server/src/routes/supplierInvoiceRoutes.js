@@ -24,16 +24,16 @@ router.get('/overdue', getOverdueInvoices);
 // GET /api/invoices/:id - Obtener factura por ID
 router.get('/:id', getInvoiceById);
 
-// POST /api/invoices - Crear factura (admin, supervisor)
-router.post('/', authorize(['admin', 'supervisor']), createInvoice);
+// POST /api/invoices - Crear factura (todos los usuarios autenticados)
+router.post('/', createInvoice);
 
-// PUT /api/invoices/:id - Actualizar factura (admin, supervisor)
-router.put('/:id', authorize(['admin', 'supervisor']), updateInvoice);
+// PUT /api/invoices/:id - Actualizar factura (todos los usuarios autenticados)
+router.put('/:id', updateInvoice);
 
-// POST /api/invoices/:id/payment - Registrar pago (admin, supervisor)
-router.post('/:id/payment', authorize(['admin', 'supervisor']), recordPayment);
+// POST /api/invoices/:id/payment - Registrar pago (todos los usuarios autenticados)
+router.post('/:id/payment', recordPayment);
 
-// DELETE /api/invoices/:id - Eliminar factura (solo admin)
-router.delete('/:id', authorize(['admin']), deleteInvoice);
+// DELETE /api/invoices/:id - Eliminar factura (admin, supervisor)
+router.delete('/:id', authorize(['admin', 'supervisor']), deleteInvoice);
 
 export default router;

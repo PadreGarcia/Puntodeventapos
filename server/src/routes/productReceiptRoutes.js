@@ -19,13 +19,13 @@ router.get('/', getReceipts);
 // GET /api/receipts/:id - Obtener recepción por ID
 router.get('/:id', getReceiptById);
 
-// POST /api/receipts - Crear recepción (admin, supervisor)
-router.post('/', authorize(['admin', 'supervisor']), createReceipt);
+// POST /api/receipts - Crear recepción (todos los usuarios autenticados)
+router.post('/', createReceipt);
 
-// PUT /api/receipts/:id - Actualizar recepción (admin, supervisor)
-router.put('/:id', authorize(['admin', 'supervisor']), updateReceipt);
+// PUT /api/receipts/:id - Actualizar recepción (todos los usuarios autenticados)
+router.put('/:id', updateReceipt);
 
-// DELETE /api/receipts/:id - Eliminar recepción (solo admin)
-router.delete('/:id', authorize(['admin']), deleteReceipt);
+// DELETE /api/receipts/:id - Eliminar recepción (admin, supervisor)
+router.delete('/:id', authorize(['admin', 'supervisor']), deleteReceipt);
 
 export default router;
