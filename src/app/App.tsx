@@ -168,6 +168,8 @@ export default function App() {
     try {
       const response = await api.getProducts();
       if (response.success && response.data) {
+        console.log('📦 Productos recibidos del backend:', response.data);
+        console.log('📦 Primer producto:', response.data[0]);
         setProducts(response.data);
       }
     } catch (error) {

@@ -6,9 +6,15 @@ export const getProducts = async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
     
+    // Mapear _id a id para compatibilidad con frontend
+    const formattedProducts = products.map(product => ({
+      ...product.toObject(),
+      id: product._id.toString()
+    }));
+    
     res.json({
       success: true,
-      data: products
+      data: formattedProducts
     });
   } catch (error) {
     console.error('Error al obtener productos:', error);
@@ -31,9 +37,15 @@ export const getProductById = async (req, res) => {
       });
     }
 
+    // Mapear _id a id para compatibilidad con frontend
+    const formattedProduct = {
+      ...product.toObject(),
+      id: product._id.toString()
+    };
+
     res.json({
       success: true,
-      data: product
+      data: formattedProduct
     });
   } catch (error) {
     console.error('Error al obtener producto:', error);
@@ -56,9 +68,15 @@ export const getProductByBarcode = async (req, res) => {
       });
     }
 
+    // Mapear _id a id para compatibilidad con frontend
+    const formattedProduct = {
+      ...product.toObject(),
+      id: product._id.toString()
+    };
+
     res.json({
       success: true,
-      data: product
+      data: formattedProduct
     });
   } catch (error) {
     console.error('Error al buscar producto:', error);
@@ -87,9 +105,15 @@ export const createProduct = async (req, res) => {
       success: true
     });
 
+    // Mapear _id a id para compatibilidad con frontend
+    const formattedProduct = {
+      ...product.toObject(),
+      id: product._id.toString()
+    };
+
     res.status(201).json({
       success: true,
-      data: product,
+      data: formattedProduct,
       message: 'Producto creado exitosamente'
     });
   } catch (error) {
@@ -130,9 +154,15 @@ export const updateProduct = async (req, res) => {
       success: true
     });
 
+    // Mapear _id a id para compatibilidad con frontend
+    const formattedProduct = {
+      ...product.toObject(),
+      id: product._id.toString()
+    };
+
     res.json({
       success: true,
-      data: product,
+      data: formattedProduct,
       message: 'Producto actualizado exitosamente'
     });
   } catch (error) {
@@ -226,9 +256,15 @@ export const adjustInventory = async (req, res) => {
       success: true
     });
 
+    // Mapear _id a id para compatibilidad con frontend
+    const formattedProduct = {
+      ...product.toObject(),
+      id: product._id.toString()
+    };
+
     res.json({
       success: true,
-      data: product,
+      data: formattedProduct,
       message: 'Inventario ajustado exitosamente'
     });
   } catch (error) {
