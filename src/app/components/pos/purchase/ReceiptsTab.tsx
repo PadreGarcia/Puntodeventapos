@@ -109,23 +109,31 @@ export function ReceiptsTab({
 
     const receiptNumber = `REC-${Date.now().toString().slice(-8)}`;
 
-    // Crear el recibo
-    const newReceipt: ProductReceipt = {
-      id: Math.random().toString(36).substr(2, 9),
+    // Crear el recibo (sin id, el backend lo genera)
+    const newReceipt = {
       receiptNumber,
       purchaseOrderId: selectedOrder.id,
       purchaseOrderNumber: selectedOrder.orderNumber,
       supplierId: selectedOrder.supplierId,
       supplierName: selectedOrder.supplierName,
-      items: receivedItems,
-      receivedAt: new Date(),
+      items: receivedItems.map(item => ({
+        productId: item.productId,
+        productName: item.productName,
+        orderedQuantity: item.orderedQuantity,
+        receivedQuantity: item.receivedQuantity,
+        unitCost: item.unitCost || 0,
+        isComplete: item.isComplete
+      })),
+      receivedAt: new Date().toISOString(),
       receivedBy: 'Usuario',
-      notes,
+      notes: notes || '',
     };
 
     try {
       // Guardar recibo en backend
+      console.log('📦 Enviando recibo al backend:', newReceipt);
       const savedReceipt = await purchaseService.createReceipt(newReceipt);
+      console.log('✅ Recibo guardado:', savedReceipt);
       onUpdateReceipts([...receipts, savedReceipt]);
 
       // Actualizar stock de productos
