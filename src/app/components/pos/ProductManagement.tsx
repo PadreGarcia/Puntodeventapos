@@ -341,7 +341,7 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
               </span>
               <div className="flex gap-1">
                 <button
-                  onClick={(e) => {
+                  onMouseDown={(e) => {
                     e.stopPropagation();
                     onShowCode({ product, type: 'qr' });
                   }}
@@ -351,7 +351,7 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
                   <QrCode className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={(e) => {
+                  onMouseDown={(e) => {
                     e.stopPropagation();
                     onShowCode({ product, type: 'barcode' });
                   }}
@@ -369,7 +369,7 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
             {/* Ajustar Inventario */}
             {onAdjustInventory && (
               <button
-                onClick={(e) => {
+                onMouseDown={(e) => {
                   e.stopPropagation();
                   onAdjustInventory(product);
                 }}
@@ -384,7 +384,7 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
             {/* Editar */}
             {canEdit && (
               <button
-                onClick={(e) => {
+                onMouseDown={(e) => {
                   e.stopPropagation();
                   onEdit(product);
                 }}
@@ -399,7 +399,7 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
             {/* Eliminar */}
             {canDelete && (
               <button
-                onClick={(e) => {
+                onMouseDown={(e) => {
                   e.stopPropagation();
                   onDelete(product.id);
                 }}
@@ -625,7 +625,7 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
                               {/* Ajustar Inventario */}
                               {onNavigateToInventory && (
                                 <button
-                                  onClick={() => handleAdjustInventory(product)}
+                                  onMouseDown={() => handleAdjustInventory(product)}
                                   className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                                   title="Ajustar Inventario"
                                 >
@@ -636,7 +636,7 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
                               {/* Editar */}
                               {canEdit && (
                                 <button
-                                  onClick={() => handleOpenForm(product)}
+                                  onMouseDown={() => handleOpenForm(product)}
                                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                   title="Editar"
                                 >
@@ -647,7 +647,7 @@ export function ProductManagement({ products, onUpdateProducts, suppliers, curre
                               {/* Eliminar */}
                               {canDelete && (
                                 <button
-                                  onClick={() => handleDelete(product.id)}
+                                  onMouseDown={() => handleDelete(product.id)}
                                   className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                   title="Eliminar"
                                 >

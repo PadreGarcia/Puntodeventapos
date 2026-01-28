@@ -208,7 +208,7 @@ export function InventoryManagement({ products, onUpdateProducts, currentUser }:
 
           {/* Botón de Ajuste */}
           <button
-            onClick={(e) => {
+            onMouseDown={(e) => {
               e.stopPropagation();
               onAdjust(product);
             }}
@@ -399,7 +399,7 @@ export function InventoryManagement({ products, onUpdateProducts, currentUser }:
                               </td>
                               <td className="px-6 py-4 text-center">
                                 <button
-                                  onClick={() => handleOpenAdjustment(product)}
+                                  onMouseDown={() => handleOpenAdjustment(product)}
                                   className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-bold shadow-md hover:shadow-lg transition-all active:scale-95"
                                 >
                                   <TrendingUp className="w-4 h-4" />
