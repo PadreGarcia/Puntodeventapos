@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Plus, Edit2, Trash2, X, Save, Building2, Mail, Phone, MapPin, FileText, AlertCircle, Calendar, Copy } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, X, Save, Building2, Mail, Phone, FileText, AlertCircle, Calendar, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import { purchaseService } from '@/services';
 import type { Supplier, Product } from '@/types/pos';
@@ -297,17 +297,6 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
                         </button>
                       </div>
                     </div>
-
-                    {/* Dirección - Línea completa */}
-                    <div className="flex items-start gap-3 bg-purple-50/50 rounded-xl p-3 border border-purple-100">
-                      <div className="flex-shrink-0 w-9 h-9 bg-purple-100 rounded-lg flex items-center justify-center mt-0.5">
-                        <MapPin className="w-4 h-4 text-purple-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-purple-600 font-bold uppercase mb-0.5">Dirección</p>
-                        <p className="text-sm text-gray-900 line-clamp-2 leading-relaxed">{supplier.address}</p>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Días de visita */}
@@ -330,22 +319,8 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
                     </div>
                   )}
 
-                  {/* Footer con stats */}
+                  {/* Footer con botones de acción */}
                   <div className="pt-4 border-t-2 border-gray-100">
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-3 border border-blue-200">
-                        <div className="text-xs text-blue-700 font-bold uppercase mb-1">Términos</div>
-                        <div className="text-lg font-black text-blue-900">
-                          {supplier.paymentTerms === 0 ? 'Contado' : `${supplier.paymentTerms}d`}
-                        </div>
-                      </div>
-                      <div className="bg-gradient-to-br from-[#EC0000]/10 to-[#EC0000]/20 rounded-xl p-3 border border-[#EC0000]/30">
-                        <div className="text-xs text-[#EC0000] font-bold uppercase mb-1">Productos</div>
-                        <div className="text-lg font-black text-[#EC0000]">{getProductCount(supplier.id)}</div>
-                      </div>
-                    </div>
-
-                    {/* Botones de acción */}
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleOpenModal(supplier)}
