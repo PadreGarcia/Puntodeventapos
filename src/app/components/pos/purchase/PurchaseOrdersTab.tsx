@@ -636,47 +636,6 @@ export function PurchaseOrdersTab({
                                 </select>
                               </div>
                             </div>
-
-                            {/* Equivalencia opcional */}
-                            <div className="bg-blue-50 rounded-lg p-3">
-                              <label className="block text-xs font-bold text-blue-700 mb-2">
-                                Equivalencia (Opcional)
-                              </label>
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-bold text-blue-900">1 {item.unit} =</span>
-                                <input
-                                  type="number"
-                                  min="1"
-                                  placeholder="24"
-                                  value={item.unitEquivalence || ''}
-                                  onChange={(e) => handleUpdateEquivalence(
-                                    item.productId, 
-                                    parseInt(e.target.value) || 0,
-                                    item.equivalenceUnit || 'pieza'
-                                  )}
-                                  className="w-20 px-3 py-2 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-center font-bold"
-                                />
-                                <select
-                                  value={item.equivalenceUnit || 'pieza'}
-                                  onChange={(e) => handleUpdateEquivalence(
-                                    item.productId,
-                                    item.unitEquivalence || 0,
-                                    e.target.value
-                                  )}
-                                  className="flex-1 px-3 py-2 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-bold text-sm"
-                                >
-                                  <option value="pieza">pieza(s)</option>
-                                  <option value="botella">botella(s)</option>
-                                  <option value="unidad">unidad(es)</option>
-                                  <option value="lata">lata(s)</option>
-                                </select>
-                              </div>
-                              {item.unitEquivalence && item.unitEquivalence > 0 && (
-                                <div className="mt-2 text-xs font-bold text-blue-600">
-                                  Total: {item.quantity} {item.unit}(s) = {item.quantity * item.unitEquivalence} {item.equivalenceUnit}(s)
-                                </div>
-                              )}
-                            </div>
                           </div>
                         ))}
                       </div>
