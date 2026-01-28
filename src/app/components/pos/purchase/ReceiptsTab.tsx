@@ -209,30 +209,70 @@ export function ReceiptsTab({
           ) : (
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-4">Órdenes Pendientes de Recibir</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-                {pendingOrders.map(order => (
-                  <div
-                    key={order.id}
-                    className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-200 hover:shadow-lg transition-all"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h4 className="font-bold text-gray-900">{order.orderNumber}</h4>
-                        <p className="text-sm text-gray-600">{order.supplierName}</p>
-                      </div>
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-blue-500 text-white">
-                        {order.items.length} items
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => handleOpenModal(order)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-bold transition-all active:scale-95"
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {pendingOrders.map(order => {
+                  const totalUnits = order.items.reduce((sum, item) => sum + item.quantity, 0);
+                  
+                  return (
+                    <div
+                      key={order.id}
+                      className="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-blue-300"
                     >
-                      <Package className="w-4 h-4" />
-                      Capturar mercancía
-                    </button>
-                  </div>
-                ))}
+                      {/* Header con gradiente azul */}
+                      <div className="relative bg-gradient-to-br from-blue-600 to-blue-700 p-5 overflow-hidden">
+                        {/* Patrón decorativo */}
+                        <div className="absolute inset-0 opacity-10">
+                          <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
+                          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
+                        </div>
+                        
+                        <div className="relative flex items-start justify-between gap-3">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl flex-shrink-0 group-hover:bg-white/30 transition-colors">
+                              <Package className="w-6 h-6 text-white" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-bold text-white text-lg truncate drop-shadow-sm">{order.orderNumber}</h3>
+                              <p className="text-sm text-white/90 truncate mt-0.5">{order.supplierName}</p>
+                            </div>
+                          </div>
+                          
+                          {/* Badge de items */}
+                          <div className="flex-shrink-0">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold backdrop-blur-sm bg-white/90 text-blue-700">
+                              {order.items.length} items
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-5">
+                        {/* Unidades totales */}
+                        <div className="mb-4">
+                          <div className="flex items-center gap-3 bg-green-50/50 rounded-xl p-3 border border-green-100">
+                            <div className="flex-shrink-0 w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-xs text-green-600 font-bold uppercase mb-0.5">Total a recibir</p>
+                              <p className="text-lg text-gray-900 font-bold">{totalUnits} unidades</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Botón de acción */}
+                        <button
+                          onClick={() => handleOpenModal(order)}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-green-500/30"
+                        >
+                          <Package className="w-5 h-5" />
+                          Capturar Mercancía
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -280,39 +320,39 @@ export function ReceiptsTab({
               return (
                 <div
                   key={receipt.id}
-                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all border border-gray-200 p-3 cursor-pointer"
+                  className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200 p-3 cursor-pointer hover:border-green-300"
                 >
                   {/* Header */}
                   <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h4 className="font-bold text-sm text-gray-900">{receipt.receiptNumber}</h4>
-                      <p className="text-xs text-gray-600 mt-0.5">{receipt.supplierName}</p>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-sm text-gray-900 truncate">{receipt.receiptNumber}</h4>
+                      <p className="text-xs text-gray-600 mt-0.5 truncate">{receipt.supplierName}</p>
                     </div>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700">
+                    <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-500/90 text-white">
                       <CheckCircle className="w-3 h-3" />
                       OK
                     </span>
                   </div>
 
                   {/* Fecha */}
-                  <div className="text-xs text-gray-500 mb-2">
+                  <div className="text-xs text-gray-500 mb-2 font-medium">
                     {formatDate(receipt.receivedAt)}
                   </div>
 
                   {/* Stats */}
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-blue-50 rounded px-2 py-1.5">
+                    <div className="bg-blue-50 rounded-lg px-2 py-1.5 border border-blue-100">
                       <div className="text-[10px] text-blue-600 uppercase font-bold mb-0.5">Items</div>
                       <div className="text-sm font-bold text-blue-900">{totalItems}</div>
                     </div>
-                    <div className="bg-green-50 rounded px-2 py-1.5">
+                    <div className="bg-green-50 rounded-lg px-2 py-1.5 border border-green-100">
                       <div className="text-[10px] text-green-600 uppercase font-bold mb-0.5">Completo</div>
                       <div className="text-sm font-bold text-green-900">{completeItems}/{receipt.items.length}</div>
                     </div>
                   </div>
 
                   {/* Recibido por */}
-                  <div className="mt-2 pt-2 border-t border-gray-100">
+                  <div className="mt-2 pt-2 border-t border-gray-200">
                     <div className="text-[10px] text-gray-500 uppercase font-bold mb-0.5">Recibido por</div>
                     <div className="text-xs font-semibold text-gray-900 truncate">{receipt.receivedBy}</div>
                   </div>
