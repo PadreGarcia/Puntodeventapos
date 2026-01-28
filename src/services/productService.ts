@@ -47,6 +47,22 @@ export interface InventoryAdjustment {
   notes?: string;
 }
 
+// Helper para transformar _id de MongoDB a id
+const transformMongoDoc = (doc: any): any => {
+  if (!doc) return doc;
+  
+  if (Array.isArray(doc)) {
+    return doc.map(transformMongoDoc);
+  }
+  
+  if (doc._id) {
+    const { _id, ...rest } = doc;
+    return { id: _id, ...rest };
+  }
+  
+  return doc;
+};
+
 class ProductService {
   /**
    * Obtener todos los productos
@@ -63,53 +79,60 @@ class ProductService {
     }
 
     const query = params.toString() ? `?${params.toString()}` : '';
-    return apiClient.get<Product[]>(`/products${query}`);
+    const response = await apiClient.get<Product[]>(`/products${query}`);
+    return transformMongoDoc(response.data || []);
   }
 
   /**
    * Obtener producto por ID
    */
   async getById(id: string) {
-    return apiClient.get<Product>(`/products/${id}`);
+    const response = await apiClient.get<Product>(`/products/${id}`);
+    return transformMongoDoc(response.data);
   }
 
   /**
    * Buscar producto por código de barras
    */
   async getByBarcode(barcode: string) {
-    return apiClient.get<Product>(`/products/barcode/${barcode}`);
+    const response = await apiClient.get<Product>(`/products/barcode/${barcode}`);
+    return transformMongoDoc(response.data);
   }
 
   /**
    * Crear nuevo producto
    */
   async create(product: Omit<Product, '_id' | 'createdAt' | 'updatedAt'>) {
-    return apiClient.post<Product>('/products', product);
+    const response = await apiClient.post<Product>('/products', product);
+    return transformMongoDoc(response.data);
   }
 
   /**
    * Actualizar producto
    */
   async update(id: string, product: Partial<Product>) {
-    return apiClient.put<Product>(`/products/${id}`, product);
+    const response = await apiClient.put<Product>(`/products/${id}`, product);
+    return transformMongoDoc(response.data);
   }
 
   /**
    * Eliminar producto
    */
   async delete(id: string) {
-    return apiClient.delete(`/products/${id}`);
+    const response = await apiClient.delete(`/products/${id}`);
+    return transformMongoDoc(response.data);
   }
 
   /**
    * Ajustar inventario
    */
   async adjustInventory(adjustment: InventoryAdjustment) {
-    return apiClient.patch<Product>(`/products/${adjustment.productId}/inventory`, {
+    const response = await apiClient.patch<Product>(`/products/${adjustment.productId}/inventory`, {
       adjustment: adjustment.adjustment,
       reason: adjustment.reason,
       notes: adjustment.notes,
     });
+    return transformMongoDoc(response.data);
   }
 
   /**
@@ -117,7 +140,8 @@ class ProductService {
    * Usa el filtro 'search' del endpoint GET /products
    */
   async search(query: string) {
-    return apiClient.get<Product[]>(`/products?search=${encodeURIComponent(query)}`);
+    const response = await apiClient.get<Product[]>(`/products?search=${encodeURIComponent(query)}`);
+    return transformMongoDoc(response.data || []);
   }
 }
 

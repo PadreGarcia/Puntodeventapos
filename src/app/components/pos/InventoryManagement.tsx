@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import type { Product, InventoryMovement, User } from '@/types/pos';
 import { validateInventoryAdjustment } from '@/utils/stockValidation';
 import { hasPermission, MODULES } from '@/utils/permissions';
+import { productService } from '@/services';
 
 interface InventoryManagementProps {
   products: Product[];
@@ -84,7 +85,7 @@ export function InventoryManagement({ products, onUpdateProducts, currentUser }:
     setAdjustmentReason('');
   };
 
-  const handleSubmitAdjustment = () => {
+  const handleSubmitAdjustment = async () => {
     if (!adjustmentModal) return;
 
     const { product } = adjustmentModal;
@@ -113,34 +114,45 @@ export function InventoryManagement({ products, onUpdateProducts, currentUser }:
       return;
     }
     
-    const newStock = product.stock + adjustmentValue;
+    try {
+      // Actualizar inventario en el backend
+      const updatedProduct = await productService.adjustInventory({
+        productId: product.id,
+        adjustment: adjustmentValue,
+        reason: adjustmentReason,
+        notes: `Ajuste de inventario por ${currentUser?.fullName || 'Usuario'}`
+      });
 
-    // Crear movimiento
-    const movement: InventoryMovement = {
-      id: Math.random().toString(36).substr(2, 9),
-      productId: product.id,
-      productName: product.name,
-      type: adjustmentValue > 0 ? 'Entrada' : 'Salida',
-      quantity: Math.abs(adjustmentValue),
-      previousStock: product.stock,
-      newStock: newStock,
-      reason: adjustmentReason,
-      timestamp: new Date(),
-      user: 'Usuario'
-    };
+      // Crear movimiento para el historial local
+      const movement: InventoryMovement = {
+        id: Math.random().toString(36).substr(2, 9),
+        productId: product.id,
+        productName: product.name,
+        type: adjustmentValue > 0 ? 'Entrada' : 'Salida',
+        quantity: Math.abs(adjustmentValue),
+        previousStock: product.stock,
+        newStock: updatedProduct.stock,
+        reason: adjustmentReason,
+        timestamp: new Date(),
+        user: currentUser?.fullName || 'Usuario'
+      };
 
-    setMovements(prev => [movement, ...prev]);
+      setMovements(prev => [movement, ...prev]);
 
-    // Actualizar stock del producto
-    const updatedProducts = products.map(p =>
-      p.id === product.id ? { ...p, stock: newStock } : p
-    );
-    onUpdateProducts(updatedProducts);
+      // Actualizar productos en el estado
+      const updatedProducts = products.map(p =>
+        p.id === product.id ? updatedProduct : p
+      );
+      onUpdateProducts(updatedProducts);
 
-    // Mostrar notificación
-    toast.success(`Stock ajustado: ${product.name} ${adjustmentValue > 0 ? '+' : ''}${adjustmentValue} unidades`);
+      // Mostrar notificación
+      toast.success(`Stock ajustado: ${product.name} ${adjustmentValue > 0 ? '+' : ''}${adjustmentValue} unidades`);
 
-    handleCloseAdjustment();
+      handleCloseAdjustment();
+    } catch (error) {
+      console.error('Error al ajustar inventario:', error);
+      toast.error('Error al ajustar el inventario');
+    }
   };
 
   const formatDate = (date: Date) => {

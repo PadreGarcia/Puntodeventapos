@@ -26,6 +26,7 @@ import {
   validatePriceChange,
   CASHIER_LIMITS,
 } from "@/utils/permissions";
+import { productService } from "@/services";
 
 interface ProductManagementProps {
   products: Product[];
@@ -239,85 +240,112 @@ export function ProductManagement({
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (editingProduct) {
-      // Editar producto existente
+    try {
+      if (editingProduct) {
+        // Editar producto existente
 
-      // ✅ VALIDACIÓN: Verificar si es cambio de precio y si está dentro del límite del cajero
-      if (formData.price !== editingProduct.price) {
-        const validation = validatePriceChange(
-          currentUser,
-          editingProduct.price,
-          formData.price || 0,
+        // ✅ VALIDACIÓN: Verificar si es cambio de precio y si está dentro del límite del cajero
+        if (formData.price !== editingProduct.price) {
+          const validation = validatePriceChange(
+            currentUser,
+            editingProduct.price,
+            formData.price || 0,
+          );
+
+          if (!validation.valid) {
+            toast.error(
+              validation.message ||
+                "No puedes cambiar este precio",
+              {
+                duration: 4000,
+                icon: <ShieldAlert className="w-5 h-5" />,
+              },
+            );
+            return;
+          }
+
+          // Si es cajero y el cambio es válido, mostrar advertencia informativa
+          if (
+            currentUser?.role === "cashier" &&
+            validation.percentChange
+          ) {
+            toast.warning(
+              `Cambio de precio registrado: ${validation.percentChange > 0 ? "+" : ""}${validation.percentChange.toFixed(1)}% (Límite: ±${CASHIER_LIMITS.MAX_PRICE_CHANGE_PERCENT}%)`,
+              { duration: 4000 },
+            );
+          }
+        }
+
+        // Preparar datos para actualizar
+        const updateData = {
+          name: formData.name,
+          price: formData.price,
+          cost: formData.cost,
+          category: formData.category,
+          stock: formData.stock,
+          image: formData.image,
+          barcode: formData.barcode,
+          minStock: formData.minStock,
+          description: formData.description,
+          supplierId: formData.supplierId,
+          supplierName: formData.supplierName,
+          isActive: formData.isActive ?? true,
+        };
+
+        const updatedProduct = await productService.update(editingProduct.id, updateData);
+        
+        const updatedProducts = products.map((p) =>
+          p.id === editingProduct.id ? updatedProduct : p
         );
+        onUpdateProducts(updatedProducts);
+        toast.success("Producto actualizado correctamente");
+      } else {
+        // Crear nuevo producto
 
-        if (!validation.valid) {
-          toast.error(
-            validation.message ||
-              "No puedes cambiar este precio",
+        // ✅ CAJERO NIVEL 2: Informar que el producto será auditado
+        if (currentUser?.role === "cashier") {
+          toast.info(
+            "Producto agregado. Esta acción será revisada por supervisión.",
             {
-              duration: 4000,
-              icon: <ShieldAlert className="w-5 h-5" />,
+              duration: 3000,
             },
           );
-          return;
         }
 
-        // Si es cajero y el cambio es válido, mostrar advertencia informativa
-        if (
-          currentUser?.role === "cashier" &&
-          validation.percentChange
-        ) {
-          toast.warning(
-            `Cambio de precio registrado: ${validation.percentChange > 0 ? "+" : ""}${validation.percentChange.toFixed(1)}% (Límite: ±${CASHIER_LIMITS.MAX_PRICE_CHANGE_PERCENT}%)`,
-            { duration: 4000 },
-          );
-        }
+        const newProductData = {
+          name: formData.name || "",
+          price: formData.price || 0,
+          cost: formData.cost || 0,
+          category: formData.category || categories[0],
+          stock: formData.stock || 0,
+          image:
+            formData.image ||
+            "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
+          barcode: formData.barcode || generateBarcode(),
+          minStock: formData.minStock || 5,
+          maxStock: formData.maxStock,
+          unit: formData.unit || 'pza',
+          description: formData.description || "",
+          supplier: formData.supplierId,
+          isActive: true,
+          tax: formData.tax || 0,
+          discount: formData.discount || 0,
+          tags: formData.tags || [],
+        };
+
+        const savedProduct = await productService.create(newProductData);
+        onUpdateProducts([...products, savedProduct]);
+        toast.success("Producto creado correctamente");
       }
 
-      const updatedProducts = products.map((p) =>
-        p.id === editingProduct.id
-          ? ({ ...formData, id: editingProduct.id } as Product)
-          : p,
-      );
-      onUpdateProducts(updatedProducts);
-      toast.success("Producto actualizado correctamente");
-    } else {
-      // Crear nuevo producto
-
-      // ✅ CAJERO NIVEL 2: Informar que el producto será auditado
-      if (currentUser?.role === "cashier") {
-        toast.info(
-          "Producto agregado. Esta acción será revisada por supervisión.",
-          {
-            duration: 3000,
-          },
-        );
-      }
-
-      const newProduct: Product = {
-        id: Math.random().toString(36).substr(2, 9),
-        name: formData.name || "",
-        price: formData.price || 0,
-        cost: formData.cost,
-        category: formData.category || categories[0],
-        stock: formData.stock || 0,
-        image:
-          formData.image ||
-          "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
-        barcode: formData.barcode || generateBarcode(),
-        minStock: formData.minStock,
-        description: formData.description,
-        supplierId: formData.supplierId,
-        supplierName: formData.supplierName,
-      };
-      onUpdateProducts([...products, newProduct]);
-      toast.success("Producto creado correctamente");
+      handleCloseForm();
+    } catch (error) {
+      console.error('Error al guardar producto:', error);
+      toast.error('Error al guardar el producto');
     }
-
-    handleCloseForm();
   };
 
   const handleDelete = (productId: string) => {
@@ -339,19 +367,21 @@ export function ProductManagement({
     }
   };
 
-  const handleConfirmDelete = () => {
-    if (deleteModal) {
-      const product = deleteModal;
-      const updatedProducts = products.filter(
-        (p) => p.id !== product.id,
-      );
-      onUpdateProducts(updatedProducts);
-      toast.success(
-        `Producto "${product.name}" eliminado correctamente`,
-      );
+  const confirmDelete = async () => {
+    if (!deleteModal) return;
+
+    try {
+      await productService.delete(deleteModal.id);
+      onUpdateProducts(products.filter((p) => p.id !== deleteModal.id));
+      toast.success("Producto eliminado correctamente");
       setDeleteModal(null);
+    } catch (error) {
+      console.error('Error al eliminar producto:', error);
+      toast.error('Error al eliminar el producto');
     }
   };
+
+
 
   const handleAdjustInventory = (product: Product) => {
     if (onNavigateToInventory) {
@@ -1448,7 +1478,7 @@ export function ProductManagement({
                 Cancelar
               </button>
               <button
-                onMouseDown={handleConfirmDelete}
+                onMouseDown={confirmDelete}
                 className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl shadow-red-500/30 transition-all active:scale-95"
               >
                 <Trash2 className="w-5 h-5" />

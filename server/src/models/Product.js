@@ -12,6 +12,10 @@ const productSchema = new mongoose.Schema({
     sparse: true,
     trim: true
   },
+  sku: {
+    type: String,
+    trim: true
+  },
   price: {
     type: Number,
     required: true,
@@ -19,7 +23,8 @@ const productSchema = new mongoose.Schema({
   },
   cost: {
     type: Number,
-    min: 0
+    min: 0,
+    default: 0
   },
   image: {
     type: String,
@@ -38,24 +43,51 @@ const productSchema = new mongoose.Schema({
   },
   minStock: {
     type: Number,
-    default: 0,
+    default: 5,
     min: 0
   },
-  reorderPoint: {
+  maxStock: {
     type: Number,
     min: 0
   },
-  description: {
+  unit: {
     type: String,
+    default: 'pza',
     trim: true
   },
-  supplierId: {
+  description: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  supplier: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Supplier'
   },
+  supplierId: {
+    type: String
+  },
   supplierName: {
     type: String
-  }
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  tax: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  discount: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  tags: [{
+    type: String,
+    trim: true
+  }]
 }, {
   timestamps: true
 });

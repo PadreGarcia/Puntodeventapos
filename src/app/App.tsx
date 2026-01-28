@@ -28,6 +28,7 @@ import { validateStockForCart, validateSaleStock, updateStockAfterSale } from '@
 import { hasPermission, canAccessModule, MODULES, getActionCriticality } from '@/utils/permissions';
 import { AccessDenied } from '@/app/components/common/AccessDenied';
 import { api } from '@/services/api';
+import { productService, purchaseService } from '@/services';
 
 // Productos - inicialmente vacío
 const MOCK_PRODUCTS: Product[] = [];
@@ -184,11 +185,12 @@ export default function App() {
     
     // Cargar productos desde el backend
     try {
-      const response = await api.getProducts();
-      if (response.success && response.data) {
-        console.log('📦 Productos recibidos del backend:', response.data);
-        console.log('📦 Primer producto:', response.data[0]);
-        setProducts(response.data);
+      const productsData = await productService.getAll();
+      console.log('📦 Productos recibidos del backend:', productsData);
+      if (Array.isArray(productsData)) {
+        console.log('📦 Total productos:', productsData.length);
+        console.log('📦 Primer producto:', productsData[0]);
+        setProducts(productsData);
       }
     } catch (error) {
       console.error('Error cargando productos:', error);

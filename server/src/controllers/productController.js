@@ -92,18 +92,20 @@ export const createProduct = async (req, res) => {
   try {
     const product = await Product.create(req.body);
 
-    // Auditoría
-    await AuditLog.create({
-      userId: req.userId,
-      userName: req.user.fullName,
-      userRole: req.user.role,
-      action: 'product_created',
-      module: 'products',
-      description: `Producto creado: ${product.name}`,
-      details: { productId: product._id },
-      ipAddress: req.ip,
-      success: true
-    });
+    // Auditoría - solo si hay usuario autenticado
+    if (req.userId && req.user) {
+      await AuditLog.create({
+        userId: req.userId,
+        userName: req.user.fullName,
+        userRole: req.user.role,
+        action: 'product_created',
+        module: 'products',
+        description: `Producto creado: ${product.name}`,
+        details: { productId: product._id },
+        ipAddress: req.ip,
+        success: true
+      });
+    }
 
     // Mapear _id a id para compatibilidad con frontend
     const formattedProduct = {
@@ -118,9 +120,29 @@ export const createProduct = async (req, res) => {
     });
   } catch (error) {
     console.error('Error al crear producto:', error);
+    
+    // Validación de errores de Mongoose
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Error de validación',
+        errors: errors 
+      });
+    }
+    
+    // Código de barras duplicado
+    if (error.code === 11000) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'El código de barras ya existe' 
+      });
+    }
+    
     res.status(500).json({ 
       success: false,
-      message: error.code === 11000 ? 'El código de barras ya existe' : 'Error al crear producto' 
+      message: 'Error al crear producto',
+      error: error.message
     });
   }
 };
@@ -141,18 +163,20 @@ export const updateProduct = async (req, res) => {
       });
     }
 
-    // Auditoría
-    await AuditLog.create({
-      userId: req.userId,
-      userName: req.user.fullName,
-      userRole: req.user.role,
-      action: 'product_updated',
-      module: 'products',
-      description: `Producto actualizado: ${product.name}`,
-      details: { productId: product._id },
-      ipAddress: req.ip,
-      success: true
-    });
+    // Auditoría - solo si hay usuario autenticado
+    if (req.userId && req.user) {
+      await AuditLog.create({
+        userId: req.userId,
+        userName: req.user.fullName,
+        userRole: req.user.role,
+        action: 'product_updated',
+        module: 'products',
+        description: `Producto actualizado: ${product.name}`,
+        details: { productId: product._id },
+        ipAddress: req.ip,
+        success: true
+      });
+    }
 
     // Mapear _id a id para compatibilidad con frontend
     const formattedProduct = {
@@ -167,9 +191,27 @@ export const updateProduct = async (req, res) => {
     });
   } catch (error) {
     console.error('Error al actualizar producto:', error);
+    
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Error de validación',
+        errors: errors 
+      });
+    }
+    
+    if (error.code === 11000) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'El código de barras ya existe' 
+      });
+    }
+    
     res.status(500).json({ 
       success: false,
-      message: 'Error al actualizar producto' 
+      message: 'Error al actualizar producto',
+      error: error.message
     });
   }
 };
