@@ -231,106 +231,80 @@ export function PurchaseOrdersTab({
     ? products.filter(p => p.supplierId === selectedSupplier)
     : [];
 
-  // Componente de Card de Orden - Diseño simplificado estilo Recepciones
+  // Componente de Card de Orden - Diseño compacto optimizado
   const OrderCard = ({ order }: { order: PurchaseOrder }) => {
-    const totalUnits = order.items.reduce((sum, item) => sum + item.quantity, 0);
-    
     return (
-      <div className="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-[#EC0000]/30">
-        {/* Header con gradiente rojo Santander */}
-        <div className="relative bg-gradient-to-br from-[#EC0000] to-[#C00000] p-5 overflow-hidden">
-          {/* Patrón decorativo */}
-          <div className="absolute inset-0 opacity-10 pointer-events-none">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
-          </div>
-          
-          <div className="relative flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl flex-shrink-0 group-hover:bg-white/30 transition-colors">
-                <Package className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-white text-lg truncate drop-shadow-sm">{order.supplierName}</h3>
-                <p className="text-sm text-white/90 truncate mt-0.5">{order.orderNumber}</p>
-              </div>
+      <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden border-2 border-gray-100 hover:border-[#EC0000]/40">
+        {/* HEADER: Proveedor + Estado */}
+        <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 border-b-2 border-gray-200">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <Package className="w-5 h-5 text-[#EC0000] flex-shrink-0" />
+              <h3 className="font-bold text-gray-900 text-base truncate">{order.supplierName}</h3>
             </div>
-            
-            {/* Badge de estado */}
-            <div className="flex-shrink-0">
-              {getStatusBadge(order.status)}
-            </div>
+            {getStatusBadge(order.status)}
           </div>
         </div>
 
-        {/* Content */}
-        <div className="p-5">
+        {/* BODY: Info compacta */}
+        <div className="p-4 space-y-2.5">
+          {/* Número de orden */}
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-gray-500 font-medium">Orden:</span>
+            <span className="text-gray-900 font-bold">{order.orderNumber}</span>
+          </div>
+
           {/* Fecha de creación */}
-          <div className="mb-3">
-            <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
-              <div className="flex-shrink-0 w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-4 h-4 text-gray-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-xs text-gray-600 font-bold uppercase mb-0.5">Creada</p>
-                <p className="text-sm text-gray-900 font-medium">{formatDate(order.createdAt)}</p>
-              </div>
-            </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Clock className="w-4 h-4 text-gray-400" />
+            <span className="text-gray-600">{formatDate(order.createdAt)}</span>
           </div>
 
-          {/* Items y Unidades - Grid dos columnas */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            {/* Items */}
-            <div className="flex items-center gap-2 bg-blue-50/50 rounded-xl p-3 border border-blue-100">
-              <div className="flex-shrink-0 w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Package className="w-4 h-4 text-blue-600" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-blue-600 font-bold uppercase mb-0.5">Items</p>
-                <p className="text-lg text-gray-900 font-bold">{order.items.length}</p>
-              </div>
-            </div>
-
-            {/* Unidades */}
-            <div className="flex items-center gap-2 bg-green-50/50 rounded-xl p-3 border border-green-100">
-              <div className="flex-shrink-0 w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-green-600 font-bold uppercase mb-0.5">Unidades</p>
-                <p className="text-lg text-gray-900 font-bold">{totalUnits}</p>
-              </div>
-            </div>
+          {/* Total de productos (conteo de ítems distintos) */}
+          <div className="flex items-center gap-2 text-sm">
+            <Package className="w-4 h-4 text-blue-500" />
+            <span className="text-gray-900 font-semibold">
+              {order.items.length} {order.items.length === 1 ? 'producto' : 'productos'}
+            </span>
           </div>
 
-          {/* Botones de acción - Sin border-top */}
-          <div className="flex flex-col gap-2">
+          {/* Notas cortas (si existen) */}
+          {order.notes && (
+            <div className="text-xs text-gray-500 italic truncate bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-200">
+              "{order.notes}"
+            </div>
+          )}
+        </div>
+
+        {/* FOOTER: Botones de acción */}
+        <div className="px-4 pb-4 flex gap-2">
+          <button
+            onClick={() => handleViewOrder(order)}
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-all active:scale-95 shadow-md"
+          >
+            <Eye className="w-4 h-4" />
+            Ver detalle
+          </button>
+          
+          {order.status === 'draft' && (
             <button
-              onClick={() => handleViewOrder(order)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-blue-500/30"
+              onClick={() => handleSendOrder(order)}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm transition-all active:scale-95 shadow-md"
             >
-              <Eye className="w-5 h-5" />
-              Ver Detalles
+              <Send className="w-4 h-4" />
+              Enviar
             </button>
-            {order.status === 'draft' && (
-              <button
-                onClick={() => handleSendOrder(order)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-green-500/30"
-              >
-                <Send className="w-5 h-5" />
-                Enviar a Proveedor
-              </button>
-            )}
-            {(order.status === 'draft' || order.status === 'sent') && (
-              <button
-                onClick={() => handleCancelOrder(order)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl font-bold transition-all active:scale-95"
-              >
-                <XCircle className="w-5 h-5" />
-                Cancelar Orden
-              </button>
-            )}
-          </div>
+          )}
+          
+          {(order.status === 'draft' || order.status === 'sent') && (
+            <button
+              onClick={() => handleCancelOrder(order)}
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-semibold text-sm transition-all active:scale-95 border border-red-200"
+            >
+              <XCircle className="w-4 h-4" />
+              Cancelar
+            </button>
+          )}
         </div>
       </div>
     );
