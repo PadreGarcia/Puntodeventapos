@@ -73,9 +73,6 @@ export interface PurchaseOrder {
   supplierId: string;
   supplierName: string;
   items: PurchaseOrderItem[];
-  subtotal: number;
-  tax: number;
-  total: number;
   status: 'draft' | 'sent' | 'pending' | 'approved' | 'received' | 'cancelled';
   orderDate?: Date;
   expectedDate?: Date;
@@ -91,8 +88,9 @@ export interface PurchaseOrderItem {
   productId: string;
   productName: string;
   quantity: number;
-  unitCost: number;
-  total: number;
+  unit: string; // 'caja', 'paquete', 'pieza', 'botella', etc.
+  unitEquivalence?: number; // Ejemplo: 1 caja = 24 piezas
+  equivalenceUnit?: string; // La unidad base: 'pieza', 'botella', etc.
 }
 
 export interface ProductReceipt {

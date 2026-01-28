@@ -72,8 +72,9 @@ export function PurchaseOrdersTab({
       productId: product.id,
       productName: product.name,
       quantity: 1,
-      unitCost: product.cost || 0,
-      total: product.cost || 0,
+      unit: 'pieza', // Unidad por defecto
+      unitEquivalence: undefined,
+      equivalenceUnit: undefined,
     };
 
     setOrderItems([...orderItems, newItem]);
@@ -82,15 +83,23 @@ export function PurchaseOrdersTab({
   const handleUpdateQuantity = (productId: string, quantity: number) => {
     setOrderItems(orderItems.map(item => 
       item.productId === productId
-        ? { ...item, quantity, total: item.unitCost * quantity }
+        ? { ...item, quantity }
         : item
     ));
   };
 
-  const handleUpdateCost = (productId: string, cost: number) => {
+  const handleUpdateUnit = (productId: string, unit: string) => {
     setOrderItems(orderItems.map(item => 
       item.productId === productId
-        ? { ...item, unitCost: cost, total: cost * item.quantity }
+        ? { ...item, unit }
+        : item
+    ));
+  };
+
+  const handleUpdateEquivalence = (productId: string, equivalence: number, equivalenceUnit: string) => {
+    setOrderItems(orderItems.map(item => 
+      item.productId === productId
+        ? { ...item, unitEquivalence: equivalence, equivalenceUnit }
         : item
     ));
   };
@@ -99,11 +108,8 @@ export function PurchaseOrdersTab({
     setOrderItems(orderItems.filter(item => item.productId !== productId));
   };
 
-  const calculateTotals = () => {
-    const subtotal = orderItems.reduce((sum, item) => sum + item.total, 0);
-    const tax = subtotal * 0.16; // 16% IVA
-    const total = subtotal + tax;
-    return { subtotal, tax, total };
+  const getTotalItems = () => {
+    return orderItems.reduce((sum, item) => sum + item.quantity, 0);
   };
 
   const handleCreateOrder = () => {
@@ -119,7 +125,6 @@ export function PurchaseOrdersTab({
     const supplier = suppliers.find(s => s.id === selectedSupplier);
     if (!supplier) return;
 
-    const { subtotal, tax, total } = calculateTotals();
     const orderNumber = `OC-${Date.now().toString().slice(-8)}`;
 
     const newOrder: PurchaseOrder = {
@@ -129,9 +134,6 @@ export function PurchaseOrdersTab({
       supplierName: supplier.name,
       status: 'draft',
       items: orderItems,
-      subtotal,
-      tax,
-      total,
       notes,
       createdAt: new Date(),
       createdBy: 'Usuario',
@@ -226,19 +228,7 @@ export function PurchaseOrdersTab({
         <div className="bg-blue-50 rounded-lg p-3">
           <div className="text-xs text-blue-600 font-bold uppercase mb-1">Productos</div>
           <div className="text-2xl font-bold text-blue-900">{order.items.length}</div>
-          <div className="text-xs text-blue-600">artículos</div>
-        </div>
-
-        {/* Totales */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className="bg-gray-50 rounded-lg p-3">
-            <div className="text-xs text-gray-600 font-bold uppercase mb-1">Subtotal</div>
-            <div className="text-lg font-bold text-gray-900">{formatCurrency(order.subtotal)}</div>
-          </div>
-          <div className="bg-[#EC0000]/10 rounded-lg p-3">
-            <div className="text-xs text-[#EC0000] font-bold uppercase mb-1">Total</div>
-            <div className="text-lg font-bold text-[#EC0000]">{formatCurrency(order.total)}</div>
-          </div>
+          <div className="text-xs text-blue-600">{order.items.reduce((sum, item) => sum + item.quantity, 0)} unidades totales</div>
         </div>
 
         {/* Acciones */}
@@ -393,7 +383,7 @@ export function PurchaseOrdersTab({
                         <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Proveedor</th>
                         <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Estado</th>
                         <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Items</th>
-                        <th className="px-6 py-4 text-right text-sm font-bold text-gray-700 uppercase">Total</th>
+                        <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Unidades</th>
                         <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Fecha</th>
                         <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Acciones</th>
                       </tr>
@@ -411,8 +401,8 @@ export function PurchaseOrdersTab({
                           <td className="px-6 py-4 text-center">
                             <span className="font-bold text-gray-900">{order.items.length}</span>
                           </td>
-                          <td className="px-6 py-4 text-right">
-                            <span className="font-bold text-[#EC0000]">{formatCurrency(order.total)}</span>
+                          <td className="px-6 py-4 text-center">
+                            <span className="font-bold text-gray-900">{order.items.reduce((sum, item) => sum + item.quantity, 0)}</span>
                           </td>
                           <td className="px-6 py-4 text-center text-sm text-gray-600">
                             {formatDate(order.createdAt)}
@@ -503,7 +493,7 @@ export function PurchaseOrdersTab({
                     <option value="">Selecciona un producto</option>
                     {supplierProducts.map(product => (
                       <option key={product.id} value={product.id}>
-                        {product.name} - Stock: {product.stock} - Costo: {formatCurrency(product.cost || 0)}
+                        {product.name} - Stock: {product.stock}
                       </option>
                     ))}
                   </select>
@@ -514,59 +504,106 @@ export function PurchaseOrdersTab({
               {orderItems.length > 0 && (
                 <div className="bg-gray-50 rounded-xl p-4">
                   <h4 className="font-bold text-gray-900 mb-3">Productos en la Orden</h4>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {orderItems.map(item => (
-                      <div key={item.productId} className="bg-white rounded-lg p-3 flex items-center gap-3">
-                        <div className="flex-1">
-                          <div className="font-bold text-gray-900">{item.productName}</div>
+                      <div key={item.productId} className="bg-white rounded-lg p-4 space-y-3">
+                        {/* Nombre del producto */}
+                        <div className="flex items-center justify-between">
+                          <div className="font-bold text-gray-900 text-lg">{item.productName}</div>
+                          <button
+                            onClick={() => handleRemoveItem(item.productId)}
+                            className="p-2 hover:bg-red-100 rounded-lg text-red-600 transition-colors"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
                         </div>
-                        <input
-                          type="number"
-                          min="1"
-                          value={item.quantity}
-                          onChange={(e) => handleUpdateQuantity(item.productId, parseInt(e.target.value) || 1)}
-                          className="w-20 px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-[#EC0000] outline-none text-center font-bold"
-                        />
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={item.unitCost}
-                          onChange={(e) => handleUpdateCost(item.productId, parseFloat(e.target.value) || 0)}
-                          className="w-28 px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-[#EC0000] outline-none text-right font-bold"
-                        />
-                        <div className="w-28 text-right font-bold text-gray-900">{formatCurrency(item.total)}</div>
-                        <button
-                          onClick={() => handleRemoveItem(item.productId)}
-                          className="p-2 hover:bg-red-100 rounded-lg text-red-600 transition-colors"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
+
+                        {/* Cantidad y Unidad */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-bold text-gray-600 mb-1">Cantidad</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={item.quantity}
+                              onChange={(e) => handleUpdateQuantity(item.productId, parseInt(e.target.value) || 1)}
+                              className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none text-center font-bold text-lg"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-gray-600 mb-1">Unidad</label>
+                            <select
+                              value={item.unit}
+                              onChange={(e) => handleUpdateUnit(item.productId, e.target.value)}
+                              className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none font-bold"
+                            >
+                              <option value="pieza">Pieza(s)</option>
+                              <option value="caja">Caja(s)</option>
+                              <option value="paquete">Paquete(s)</option>
+                              <option value="botella">Botella(s)</option>
+                              <option value="litro">Litro(s)</option>
+                              <option value="kilogramo">Kilogramo(s)</option>
+                              <option value="costal">Costal(es)</option>
+                              <option value="garrafon">Garrafón(es)</option>
+                              <option value="display">Display(s)</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Equivalencia opcional */}
+                        <div className="bg-blue-50 rounded-lg p-3">
+                          <label className="block text-xs font-bold text-blue-700 mb-2">
+                            Equivalencia (Opcional)
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-blue-900">1 {item.unit} =</span>
+                            <input
+                              type="number"
+                              min="1"
+                              placeholder="24"
+                              value={item.unitEquivalence || ''}
+                              onChange={(e) => handleUpdateEquivalence(
+                                item.productId, 
+                                parseInt(e.target.value) || 0,
+                                item.equivalenceUnit || 'pieza'
+                              )}
+                              className="w-20 px-3 py-2 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-center font-bold"
+                            />
+                            <select
+                              value={item.equivalenceUnit || 'pieza'}
+                              onChange={(e) => handleUpdateEquivalence(
+                                item.productId,
+                                item.unitEquivalence || 0,
+                                e.target.value
+                              )}
+                              className="flex-1 px-3 py-2 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-bold text-sm"
+                            >
+                              <option value="pieza">pieza(s)</option>
+                              <option value="botella">botella(s)</option>
+                              <option value="unidad">unidad(es)</option>
+                              <option value="lata">lata(s)</option>
+                            </select>
+                          </div>
+                          {item.unitEquivalence && item.unitEquivalence > 0 && (
+                            <div className="mt-2 text-xs font-bold text-blue-600">
+                              Total: {item.quantity} {item.unit}(s) = {item.quantity * item.unitEquivalence} {item.equivalenceUnit}(s)
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
 
-                  {/* Totales */}
-                  <div className="mt-4 pt-4 border-t-2 border-gray-200 space-y-2">
-                    {(() => {
-                      const totals = calculateTotals();
-                      return (
-                        <>
-                          <div className="flex justify-between text-gray-700">
-                            <span className="font-bold">Subtotal:</span>
-                            <span className="font-bold">{formatCurrency(totals.subtotal)}</span>
-                          </div>
-                          <div className="flex justify-between text-gray-700">
-                            <span className="font-bold">IVA (16%):</span>
-                            <span className="font-bold">{formatCurrency(totals.tax)}</span>
-                          </div>
-                          <div className="flex justify-between text-[#EC0000] text-xl">
-                            <span className="font-bold">Total:</span>
-                            <span className="font-bold">{formatCurrency(totals.total)}</span>
-                          </div>
-                        </>
-                      );
-                    })()}
+                  {/* Resumen */}
+                  <div className="mt-4 pt-4 border-t-2 border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-gray-700">Total de productos:</span>
+                      <span className="font-bold text-2xl text-[#EC0000]">{orderItems.length}</span>
+                    </div>
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="font-bold text-gray-700">Total de unidades:</span>
+                      <span className="font-bold text-2xl text-[#EC0000]">{getTotalItems()}</span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -633,36 +670,49 @@ export function PurchaseOrdersTab({
               {/* Items */}
               <div>
                 <h4 className="font-bold text-gray-900 mb-3">Productos</h4>
-                <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+                <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                   {viewOrder.items.map(item => (
-                    <div key={item.productId} className="flex items-center justify-between bg-white rounded-lg p-3">
-                      <div className="flex-1">
-                        <div className="font-bold text-gray-900">{item.productName}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-gray-600">
-                          {item.quantity} × {formatCurrency(item.unitCost)}
+                    <div key={item.productId} className="bg-white rounded-lg p-4">
+                      <div className="font-bold text-gray-900 text-lg mb-3">{item.productName}</div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-blue-50 rounded-lg p-3">
+                          <div className="text-xs text-blue-600 font-bold uppercase mb-1">Cantidad</div>
+                          <div className="text-2xl font-bold text-blue-900">{item.quantity}</div>
+                          <div className="text-xs text-blue-600">{item.unit}</div>
                         </div>
-                        <div className="font-bold text-gray-900">{formatCurrency(item.total)}</div>
+                        {item.unitEquivalence && item.unitEquivalence > 0 && (
+                          <div className="bg-green-50 rounded-lg p-3">
+                            <div className="text-xs text-green-600 font-bold uppercase mb-1">Equivalencia</div>
+                            <div className="text-xl font-bold text-green-900">
+                              {item.quantity * item.unitEquivalence}
+                            </div>
+                            <div className="text-xs text-green-600">{item.equivalenceUnit}(s)</div>
+                          </div>
+                        )}
                       </div>
+                      {item.unitEquivalence && item.unitEquivalence > 0 && (
+                        <div className="mt-3 text-sm text-gray-600 font-medium bg-gray-50 rounded-lg p-2 text-center">
+                          1 {item.unit} = {item.unitEquivalence} {item.equivalenceUnit}(s)
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Totales */}
-              <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-                <div className="flex justify-between text-gray-700">
-                  <span className="font-bold">Subtotal:</span>
-                  <span className="font-bold">{formatCurrency(viewOrder.subtotal)}</span>
-                </div>
-                <div className="flex justify-between text-gray-700">
-                  <span className="font-bold">IVA:</span>
-                  <span className="font-bold">{formatCurrency(viewOrder.tax)}</span>
-                </div>
-                <div className="flex justify-between text-[#EC0000] text-xl pt-2 border-t-2 border-gray-200">
-                  <span className="font-bold">Total:</span>
-                  <span className="font-bold">{formatCurrency(viewOrder.total)}</span>
+              {/* Resumen */}
+              <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-sm text-gray-600 font-bold uppercase mb-1">Productos</div>
+                    <div className="text-3xl font-bold text-gray-900">{viewOrder.items.length}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm text-gray-600 font-bold uppercase mb-1">Unidades Totales</div>
+                    <div className="text-3xl font-bold text-[#EC0000]">
+                      {viewOrder.items.reduce((sum, item) => sum + item.quantity, 0)}
+                    </div>
+                  </div>
                 </div>
               </div>
 
