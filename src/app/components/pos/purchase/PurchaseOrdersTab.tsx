@@ -195,15 +195,25 @@ export function PurchaseOrdersTab({
     }
   };
 
-  const getStatusBadge = (status: PurchaseOrderStatus) => {
+  const getStatusBadge = (status: PurchaseOrderStatus, compact = false) => {
     const badges = {
-      draft: { label: 'Borrador', bg: 'bg-gray-100', text: 'text-gray-700', icon: Clock },
-      sent: { label: 'Enviada', bg: 'bg-blue-100', text: 'text-blue-700', icon: Send },
-      received: { label: 'Recibida', bg: 'bg-green-100', text: 'text-green-700', icon: CheckCircle },
-      cancelled: { label: 'Cancelada', bg: 'bg-red-100', text: 'text-red-700', icon: XCircle },
+      draft: { label: 'Borrador', shortLabel: 'Borr', bg: 'bg-gray-100', text: 'text-gray-700', icon: Clock },
+      sent: { label: 'Enviada', shortLabel: 'Env', bg: 'bg-blue-100', text: 'text-blue-700', icon: Send },
+      received: { label: 'Recibida', shortLabel: 'Rec', bg: 'bg-green-100', text: 'text-green-700', icon: CheckCircle },
+      cancelled: { label: 'Cancelada', shortLabel: 'Canc', bg: 'bg-red-100', text: 'text-red-700', icon: XCircle },
     };
     const badge = badges[status];
     const Icon = badge.icon;
+    
+    if (compact) {
+      return (
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${badge.bg} ${badge.text}`}>
+          <Icon className="w-3 h-3" />
+          {badge.shortLabel}
+        </span>
+      );
+    }
+    
     return (
       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${badge.bg} ${badge.text}`}>
         <Icon className="w-4 h-4" />
@@ -235,120 +245,136 @@ export function PurchaseOrdersTab({
     ? products.filter(p => p.supplierId === selectedSupplier)
     : [];
 
-  // Componente de Card de Orden
-  const OrderCard = ({ order }: { order: PurchaseOrder }) => (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 active:scale-[0.98]">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-b border-gray-200">
-        <div className="flex items-start justify-between gap-3">
+  // Componente de Card de Orden (Sidebar)
+  const OrderCardCompact = ({ order }: { order: PurchaseOrder }) => {
+    const totalUnits = order.items.reduce((sum, item) => sum + item.quantity, 0);
+    
+    return (
+      <div 
+        onClick={() => handleViewOrder(order)}
+        className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all border border-gray-200 p-3 cursor-pointer"
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between mb-2">
           <div>
-            <h3 className="font-bold text-gray-900 text-lg">{order.orderNumber}</h3>
-            <p className="text-sm text-gray-600 mt-1">{order.supplierName}</p>
+            <h4 className="font-bold text-sm text-gray-900">{order.orderNumber}</h4>
+            <p className="text-xs text-gray-600 mt-0.5">{order.supplierName}</p>
           </div>
-          {getStatusBadge(order.status)}
+          {getStatusBadge(order.status, true)}
+        </div>
+
+        {/* Fecha */}
+        <div className="text-xs text-gray-500 mb-2">
+          {formatDate(order.createdAt)}
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-blue-50 rounded px-2 py-1.5">
+            <div className="text-[10px] text-blue-600 uppercase font-bold mb-0.5">Items</div>
+            <div className="text-sm font-bold text-blue-900">{order.items.length}</div>
+          </div>
+          <div className="bg-green-50 rounded px-2 py-1.5">
+            <div className="text-[10px] text-green-600 uppercase font-bold mb-0.5">Unidades</div>
+            <div className="text-sm font-bold text-green-900">{totalUnits}</div>
+          </div>
+        </div>
+
+        {/* Creado por */}
+        <div className="mt-2 pt-2 border-t border-gray-100">
+          <div className="text-[10px] text-gray-500 uppercase font-bold mb-0.5">Creado por</div>
+          <div className="text-xs font-semibold text-gray-900 truncate">{order.createdBy}</div>
         </div>
       </div>
+    );
+  };
 
-      {/* Content */}
-      <div className="p-4 space-y-3">
-        {/* Fecha */}
-        <div className="text-sm text-gray-600">
-          <span className="font-bold">Creada:</span> {formatDate(order.createdAt)}
+  // Componente de Card de Orden (Principal - según estado)
+  const OrderCardMain = ({ order }: { order: PurchaseOrder }) => {
+    const getGradientClass = () => {
+      switch (order.status) {
+        case 'draft':
+          return 'from-gray-50 to-gray-100 border-gray-200';
+        case 'sent':
+          return 'from-blue-50 to-blue-100 border-blue-200';
+        case 'received':
+          return 'from-green-50 to-green-100 border-green-200';
+        case 'cancelled':
+          return 'from-red-50 to-red-100 border-red-200';
+        default:
+          return 'from-gray-50 to-gray-100 border-gray-200';
+      }
+    };
+
+    return (
+      <div className={`bg-gradient-to-br ${getGradientClass()} rounded-xl p-4 border-2 hover:shadow-lg transition-all`}>
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <h4 className="font-bold text-gray-900">{order.orderNumber}</h4>
+            <p className="text-sm text-gray-600">{order.supplierName}</p>
+          </div>
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-white/80 text-gray-700 shadow-sm">
+            {order.items.length} items
+          </span>
         </div>
 
-        {/* Items */}
-        <div className="bg-blue-50 rounded-lg p-3">
-          <div className="text-xs text-blue-600 font-bold uppercase mb-1">Productos</div>
-          <div className="text-2xl font-bold text-blue-900">{order.items.length}</div>
-          <div className="text-xs text-blue-600">{order.items.reduce((sum, item) => sum + item.quantity, 0)} unidades totales</div>
+        <div className="text-xs text-gray-500 mb-3">
+          {formatDate(order.createdAt)}
         </div>
 
-        {/* Acciones */}
-        <div className="grid grid-cols-2 gap-2 pt-2">
+        <div className="flex flex-col gap-2">
           <button
             onClick={() => handleViewOrder(order)}
-            onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
-            onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-all active:scale-95"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-all active:scale-95"
           >
             <Eye className="w-4 h-4" />
-            Ver
+            Ver detalles
           </button>
           {order.status === 'draft' && (
             <button
               onClick={() => handleSendOrder(order)}
-              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
-              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-all active:scale-95"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-bold transition-all active:scale-95"
             >
               <Send className="w-4 h-4" />
-              Enviar
+              Enviar a proveedor
             </button>
           )}
           {(order.status === 'draft' || order.status === 'sent') && (
             <button
               onClick={() => handleCancelOrder(order)}
-              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
-              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all active:scale-95"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all active:scale-95"
             >
               <XCircle className="w-4 h-4" />
-              Cancelar
+              Cancelar orden
             </button>
           )}
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
-      {/* Toolbar */}
-      <div className="p-4 bg-white border-b border-gray-200">
-        {/* Alerta de Stock Bajo */}
-        {lowStockProducts.length > 0 && (
-          <div className="mb-3 bg-orange-50 border-l-4 border-orange-400 p-3 rounded-lg">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-orange-600" />
-              <p className="text-sm font-bold text-orange-900">
-                {lowStockProducts.length} producto{lowStockProducts.length !== 1 ? 's' : ''} con stock bajo
-              </p>
+    <div className="flex-1 flex flex-row h-full overflow-hidden">
+      {/* ÁREA PRINCIPAL - Órdenes por Estado */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header del área principal */}
+        <div className="p-4 bg-white border-b border-gray-200">
+          {/* Alerta de Stock Bajo */}
+          {lowStockProducts.length > 0 && (
+            <div className="mb-3 bg-orange-50 border-l-4 border-orange-400 p-3 rounded-lg">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-orange-600" />
+                <p className="text-sm font-bold text-orange-900">
+                  {lowStockProducts.length} producto{lowStockProducts.length !== 1 ? 's' : ''} con stock bajo
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Controles */}
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <div className="text-sm text-gray-600 font-medium">
-            {filteredOrders.length} de {purchaseOrders.length} órdenes
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* Toggle vista - Solo desktop */}
-            <div className="hidden lg:flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-lg transition-all ${
-                  viewMode === 'grid'
-                    ? 'bg-white text-[#EC0000] shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <Grid3x3 className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setViewMode('table')}
-                className={`p-2 rounded-lg transition-all ${
-                  viewMode === 'table'
-                    ? 'bg-white text-[#EC0000] shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <List className="w-5 h-5" />
-              </button>
+          {/* Controles */}
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="text-sm text-gray-600 font-medium">
+              {filteredOrders.length} órden{filteredOrders.length !== 1 ? 'es' : ''}
             </div>
 
             <button
@@ -359,133 +385,94 @@ export function PurchaseOrdersTab({
               <span className="hidden sm:inline">Nueva Orden</span>
             </button>
           </div>
-        </div>
 
-        {/* Filtros compactos */}
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Buscar orden o proveedor..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all font-medium"
-            />
-          </div>
+          {/* Filtro de estado */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as PurchaseOrderStatus | 'all')}
-            className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all text-sm font-medium bg-white min-w-[140px]"
+            className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all text-sm font-medium bg-white"
           >
             <option value="all">Todos los estados</option>
-            <option value="draft">Borrador</option>
-            <option value="sent">Enviada</option>
-            <option value="received">Recibida</option>
-            <option value="cancelled">Cancelada</option>
+            <option value="draft">Borradores</option>
+            <option value="sent">Enviadas</option>
+            <option value="received">Recibidas</option>
+            <option value="cancelled">Canceladas</option>
           </select>
         </div>
-      </div>
 
-      {/* Contenido */}
-      <div className="flex-1 overflow-auto p-4">
-        {filteredOrders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <Package className="w-20 h-20 text-gray-300 mb-4" />
-            <p className="text-xl font-bold text-gray-900 mb-2">No hay órdenes de compra</p>
-            <p className="text-gray-500 mb-6">Crea una nueva orden para comenzar</p>
-            <button
-              onClick={handleOpenModal}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#EC0000] to-[#D50000] text-white rounded-xl font-bold shadow-lg shadow-red-500/30"
-            >
-              <Plus className="w-5 h-5" />
-              Nueva Orden
-            </button>
-          </div>
-        ) : (
-          <>
-            {/* Vista de Cards - Móvil/Tablet o seleccionada en Desktop */}
-            <div className={`${viewMode === 'table' ? 'hidden lg:hidden' : 'block'} ${viewMode === 'grid' && 'lg:block'}`}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {/* Content - Órdenes por estado */}
+        <div className="flex-1 overflow-auto p-4">
+          {filteredOrders.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <Package className="w-20 h-20 text-gray-300 mb-4" />
+              <p className="text-xl font-bold text-gray-900 mb-2">No hay órdenes</p>
+              <p className="text-gray-500 mb-6">Crea una nueva orden para comenzar</p>
+              <button
+                onClick={handleOpenModal}
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#EC0000] to-[#D50000] text-white rounded-xl font-bold shadow-lg shadow-red-500/30"
+              >
+                <Plus className="w-5 h-5" />
+                Nueva Orden
+              </button>
+            </div>
+          ) : (
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">
+                {statusFilter === 'all' && 'Todas las Órdenes'}
+                {statusFilter === 'draft' && 'Órdenes en Borrador'}
+                {statusFilter === 'sent' && 'Órdenes Enviadas'}
+                {statusFilter === 'received' && 'Órdenes Recibidas'}
+                {statusFilter === 'cancelled' && 'Órdenes Canceladas'}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                 {filteredOrders.map(order => (
-                  <OrderCard key={order.id} order={order} />
+                  <OrderCardMain key={order.id} order={order} />
                 ))}
               </div>
             </div>
+          )}
+        </div>
+      </div>
 
-            {/* Vista de Tabla - Solo Desktop cuando está seleccionada */}
-            {viewMode === 'table' && (
-              <div className="hidden lg:block bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
-                      <tr>
-                        <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Número</th>
-                        <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Proveedor</th>
-                        <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Estado</th>
-                        <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Items</th>
-                        <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Unidades</th>
-                        <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Fecha</th>
-                        <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {filteredOrders.map(order => (
-                        <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4">
-                            <span className="font-bold text-gray-900">{order.orderNumber}</span>
-                          </td>
-                          <td className="px-6 py-4 text-gray-700">{order.supplierName}</td>
-                          <td className="px-6 py-4 text-center">
-                            {getStatusBadge(order.status)}
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <span className="font-bold text-gray-900">{order.items.length}</span>
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <span className="font-bold text-gray-900">{order.items.reduce((sum, item) => sum + item.quantity, 0)}</span>
-                          </td>
-                          <td className="px-6 py-4 text-center text-sm text-gray-600">
-                            {formatDate(order.createdAt)}
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <button
-                                onClick={() => handleViewOrder(order)}
-                                className="p-2 hover:bg-blue-100 rounded-lg text-blue-600 transition-colors"
-                                title="Ver detalles"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                              {order.status === 'draft' && (
-                                <button
-                                  onClick={() => handleSendOrder(order)}
-                                  className="p-2 hover:bg-green-100 rounded-lg text-green-600 transition-colors"
-                                  title="Enviar"
-                                >
-                                  <Send className="w-4 h-4" />
-                                </button>
-                              )}
-                              {(order.status === 'draft' || order.status === 'sent') && (
-                                <button
-                                  onClick={() => handleCancelOrder(order)}
-                                  className="p-2 hover:bg-red-100 rounded-lg text-red-600 transition-colors"
-                                  title="Cancelar"
-                                >
-                                  <XCircle className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </>
-        )}
+      {/* SIDEBAR DERECHA - Historial de Órdenes */}
+      <div className="hidden lg:flex lg:w-80 xl:w-96 flex-col border-l border-gray-200 bg-gray-50">
+        {/* Header del sidebar */}
+        <div className="p-4 bg-white border-b border-gray-200">
+          <div className="flex items-center gap-2 mb-3">
+            <Package className="w-5 h-5 text-[#EC0000]" />
+            <h3 className="font-bold text-gray-900">Historial</h3>
+          </div>
+          <div className="text-xs text-gray-600 font-medium mb-3">
+            {purchaseOrders.length} órden{purchaseOrders.length !== 1 ? 'es' : ''} total{purchaseOrders.length !== 1 ? 'es' : ''}
+          </div>
+          
+          {/* Búsqueda */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar orden..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Lista de órdenes */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-2">
+          {purchaseOrders.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center p-4">
+              <Package className="w-12 h-12 text-gray-300 mb-2" />
+              <p className="text-sm font-bold text-gray-900 mb-1">Sin órdenes</p>
+              <p className="text-xs text-gray-500">El historial aparecerá aquí</p>
+            </div>
+          ) : (
+            purchaseOrders.map(order => (
+              <OrderCardCompact key={order.id} order={order} />
+            ))
+          )}
+        </div>
       </div>
 
       {/* Modal de crear orden */}
