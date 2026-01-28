@@ -181,8 +181,66 @@ export function ReceiptsTab({
 
   return (
     <div className="flex-1 flex flex-row h-full overflow-hidden">
-      {/* SIDEBAR IZQUIERDA - Historial de Recepciones (1/5 de la pantalla) */}
-      <div className="hidden lg:flex lg:w-80 xl:w-96 flex-col border-r border-gray-200 bg-gray-50">
+      {/* ÁREA PRINCIPAL - Órdenes Pendientes (4/5 de la pantalla) */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header del área principal */}
+        <div className="p-4 bg-white border-b border-gray-200">
+          {/* Alerta de órdenes pendientes */}
+          {pendingOrders.length > 0 && (
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Package className="w-5 h-5 text-blue-600" />
+                <p className="text-sm font-bold text-blue-900">
+                  {pendingOrders.length} orden{pendingOrders.length !== 1 ? 'es' : ''} pendiente{pendingOrders.length !== 1 ? 's' : ''} de recibir
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Content - Órdenes pendientes */}
+        <div className="flex-1 overflow-auto p-4">
+          {pendingOrders.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <CheckCircle className="w-20 h-20 text-green-300 mb-4" />
+              <p className="text-xl font-bold text-gray-900 mb-2">¡Todo recibido!</p>
+              <p className="text-gray-500">No hay órdenes pendientes de recibir</p>
+            </div>
+          ) : (
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Órdenes Pendientes de Recibir</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                {pendingOrders.map(order => (
+                  <div
+                    key={order.id}
+                    className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-200 hover:shadow-lg transition-all"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h4 className="font-bold text-gray-900">{order.orderNumber}</h4>
+                        <p className="text-sm text-gray-600">{order.supplierName}</p>
+                      </div>
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-blue-500 text-white">
+                        {order.items.length} items
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleOpenModal(order)}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-bold transition-all active:scale-95"
+                    >
+                      <Package className="w-4 h-4" />
+                      Capturar mercancía
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* SIDEBAR DERECHA - Historial de Recepciones (1/5 de la pantalla) */}
+      <div className="hidden lg:flex lg:w-80 xl:w-96 flex-col border-l border-gray-200 bg-gray-50">
         {/* Header del sidebar */}
         <div className="p-4 bg-white border-b border-gray-200">
           <div className="flex items-center gap-2 mb-3">
@@ -264,65 +322,7 @@ export function ReceiptsTab({
           )}
         </div>
       </div>
-
-      {/* ÁREA PRINCIPAL - Órdenes Pendientes (4/5 de la pantalla) */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header del área principal */}
-        <div className="p-4 bg-white border-b border-gray-200">
-          {/* Alerta de órdenes pendientes */}
-          {pendingOrders.length > 0 && (
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-lg">
-              <div className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-blue-600" />
-                <p className="text-sm font-bold text-blue-900">
-                  {pendingOrders.length} orden{pendingOrders.length !== 1 ? 'es' : ''} pendiente{pendingOrders.length !== 1 ? 's' : ''} de recibir
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Content - Órdenes pendientes */}
-        <div className="flex-1 overflow-auto p-4">
-          {pendingOrders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <CheckCircle className="w-20 h-20 text-green-300 mb-4" />
-              <p className="text-xl font-bold text-gray-900 mb-2">¡Todo recibido!</p>
-              <p className="text-gray-500">No hay órdenes pendientes de recibir</p>
-            </div>
-          ) : (
-            <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Órdenes Pendientes de Recibir</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-                {pendingOrders.map(order => (
-                  <div
-                    key={order.id}
-                    className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-200 hover:shadow-lg transition-all"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h4 className="font-bold text-gray-900">{order.orderNumber}</h4>
-                        <p className="text-sm text-gray-600">{order.supplierName}</p>
-                      </div>
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-blue-500 text-white">
-                        {order.items.length} items
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => handleOpenModal(order)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-bold transition-all active:scale-95"
-                    >
-                      <Package className="w-4 h-4" />
-                      Capturar mercancía
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
+      
       {/* Modal de capturar mercancía */}
       {showModal && selectedOrder && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4 overflow-y-auto">
