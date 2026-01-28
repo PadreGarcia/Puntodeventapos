@@ -232,8 +232,8 @@ export function ReceiptsTab({
                               <Package className="w-6 h-6 text-white" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-bold text-white text-lg truncate drop-shadow-sm">{order.orderNumber}</h3>
-                              <p className="text-sm text-white/90 truncate mt-0.5">{order.supplierName}</p>
+                              <h3 className="font-bold text-white text-lg truncate drop-shadow-sm">{order.supplierName}</h3>
+                              <p className="text-sm text-white/90 truncate mt-0.5">{order.orderNumber}</p>
                             </div>
                           </div>
                           
