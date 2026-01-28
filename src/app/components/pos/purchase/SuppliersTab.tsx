@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, Plus, Edit2, Trash2, X, Save, Building2, Mail, Phone, MapPin, FileText, AlertCircle, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
+import { purchaseService } from '@/services';
 import type { Supplier, Product } from '@/types/pos';
 
 interface SuppliersTabProps {
@@ -60,7 +61,7 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
     setEditingSupplier(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name?.trim()) {
       toast.error('El nombre del proveedor es obligatorio');
       return;
@@ -82,38 +83,61 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
       return;
     }
 
-    if (editingSupplier) {
-      // Actualizar
-      const updated = suppliers.map(s => 
-        s.id === editingSupplier.id ? { ...formData, id: s.id, createdAt: s.createdAt } as Supplier : s
-      );
-      onUpdateSuppliers(updated);
-      toast.success('Proveedor actualizado correctamente');
-    } else {
-      // Crear nuevo
-      const newSupplier: Supplier = {
-        ...formData,
-        id: Math.random().toString(36).substr(2, 9),
-        createdAt: new Date(),
-      } as Supplier;
-      onUpdateSuppliers([...suppliers, newSupplier]);
-      toast.success('Proveedor creado correctamente');
-    }
+    try {
+      if (editingSupplier) {
+        // Actualizar
+        const updatedSupplier = {
+          ...formData,
+          id: editingSupplier.id,
+          createdAt: editingSupplier.createdAt,
+        } as Supplier;
+        
+        await purchaseService.updateSupplier(editingSupplier.id, updatedSupplier);
+        
+        const updated = suppliers.map(s => 
+          s.id === editingSupplier.id ? updatedSupplier : s
+        );
+        onUpdateSuppliers(updated);
+        toast.success('Proveedor actualizado correctamente');
+      } else {
+        // Crear nuevo
+        const newSupplier: Supplier = {
+          ...formData,
+          id: Math.random().toString(36).substr(2, 9),
+          createdAt: new Date(),
+        } as Supplier;
+        
+        const savedSupplier = await purchaseService.createSupplier(newSupplier);
+        
+        onUpdateSuppliers([...suppliers, savedSupplier]);
+        toast.success('Proveedor creado correctamente');
+      }
 
-    handleCloseModal();
+      handleCloseModal();
+    } catch (error) {
+      console.error('Error al guardar proveedor:', error);
+      toast.error('Error al guardar el proveedor');
+    }
   };
 
-  const handleDelete = (supplier: Supplier) => {
+  const handleDelete = async (supplier: Supplier) => {
     if (window.confirm(`¿Eliminar el proveedor "${supplier.name}"?`)) {
-      onUpdateSuppliers(suppliers.filter(s => s.id !== supplier.id));
-      
-      // Remover la asociación de productos
-      const updatedProducts = products.map(p => 
-        p.supplierId === supplier.id ? { ...p, supplierId: undefined } : p
-      );
-      onUpdateProducts(updatedProducts);
-      
-      toast.success('Proveedor eliminado');
+      try {
+        await purchaseService.deleteSupplier(supplier.id);
+        
+        onUpdateSuppliers(suppliers.filter(s => s.id !== supplier.id));
+        
+        // Remover la asociación de productos
+        const updatedProducts = products.map(p => 
+          p.supplierId === supplier.id ? { ...p, supplierId: undefined } : p
+        );
+        onUpdateProducts(updatedProducts);
+        
+        toast.success('Proveedor eliminado');
+      } catch (error) {
+        console.error('Error al eliminar proveedor:', error);
+        toast.error('Error al eliminar el proveedor');
+      }
     }
   };
 

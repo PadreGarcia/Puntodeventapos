@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, Package, CheckCircle, X, Save, AlertTriangle, Grid3x3, List, Eye } from 'lucide-react';
 import { toast } from 'sonner';
+import { purchaseService } from '@/services';
 import type { ProductReceipt, ReceiptItem, PurchaseOrder, Product } from '@/types/pos';
 
 interface ReceiptsTabProps {
@@ -88,7 +89,7 @@ export function ReceiptsTab({
     })));
   };
 
-  const handleSaveReceipt = () => {
+  const handleSaveReceipt = async () => {
     if (!selectedOrder) return;
 
     const hasReceivedItems = receivedItems.some(item => item.receivedQuantity > 0);
@@ -113,31 +114,40 @@ export function ReceiptsTab({
       notes,
     };
 
-    onUpdateReceipts([...receipts, newReceipt]);
+    try {
+      // Guardar recibo en backend
+      const savedReceipt = await purchaseService.createReceipt(newReceipt);
+      onUpdateReceipts([...receipts, savedReceipt]);
 
-    // Actualizar stock de productos
-    const updatedProducts = products.map(product => {
-      const receivedItem = receivedItems.find(item => item.productId === product.id);
-      if (receivedItem && receivedItem.receivedQuantity > 0) {
-        return {
-          ...product,
-          stock: product.stock + receivedItem.receivedQuantity,
-        };
-      }
-      return product;
-    });
-    onUpdateProducts(updatedProducts);
+      // Actualizar stock de productos
+      const updatedProducts = products.map(product => {
+        const receivedItem = receivedItems.find(item => item.productId === product.id);
+        if (receivedItem && receivedItem.receivedQuantity > 0) {
+          return {
+            ...product,
+            stock: product.stock + receivedItem.receivedQuantity,
+          };
+        }
+        return product;
+      });
+      onUpdateProducts(updatedProducts);
 
-    // Marcar la orden como recibida
-    const updatedOrders = purchaseOrders.map(order =>
-      order.id === selectedOrder.id
-        ? { ...order, status: 'received' as const, receivedAt: new Date() }
-        : order
-    );
-    onUpdatePurchaseOrders(updatedOrders);
+      // Marcar la orden como recibida
+      await purchaseService.updatePurchaseOrderStatus(selectedOrder.id, 'received');
+      
+      const updatedOrders = purchaseOrders.map(order =>
+        order.id === selectedOrder.id
+          ? { ...order, status: 'received' as const, receivedAt: new Date() }
+          : order
+      );
+      onUpdatePurchaseOrders(updatedOrders);
 
-    toast.success(`Recepción ${receiptNumber} registrada. Inventario actualizado.`);
-    handleCloseModal();
+      toast.success(`Recepción ${receiptNumber} registrada. Inventario actualizado.`);
+      handleCloseModal();
+    } catch (error) {
+      console.error('Error al guardar recepción:', error);
+      toast.error('Error al guardar la recepción');
+    }
   };
 
   const formatDate = (date: Date) => {

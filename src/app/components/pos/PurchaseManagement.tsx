@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ShoppingCart, Users, FileText, Package, CreditCard, Plus } from 'lucide-react';
+import { toast } from 'sonner';
+import { purchaseService } from '@/services';
 import { SuppliersTab } from '@/app/components/pos/purchase/SuppliersTab';
 import { PurchaseOrdersTab } from '@/app/components/pos/purchase/PurchaseOrdersTab';
 import { ReceiptsTab } from '@/app/components/pos/purchase/ReceiptsTab';
@@ -29,6 +31,40 @@ export function PurchaseManagement({ products, onUpdateProducts, suppliers, onUp
   const [receipts, setReceipts] = useState<ProductReceipt[]>([]);
   const [invoices, setInvoices] = useState<SupplierInvoice[]>([]);
   const [payables, setPayables] = useState<PayableAccount[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Cargar datos desde el backend al montar el componente
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        
+        // Cargar órdenes de compra
+        const ordersData = await purchaseService.getPurchaseOrders();
+        setPurchaseOrders(ordersData);
+
+        // Cargar recepciones
+        const receiptsData = await purchaseService.getReceipts();
+        setReceipts(receiptsData);
+
+        // Cargar facturas
+        const invoicesData = await purchaseService.getSupplierInvoices();
+        setInvoices(invoicesData);
+
+        // Cargar cuentas por pagar
+        const payablesData = await purchaseService.getPayables();
+        setPayables(payablesData);
+
+      } catch (error) {
+        console.error('Error al cargar datos de compras:', error);
+        toast.error('Error al cargar datos de compras');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const tabs = [
     { id: 'suppliers' as TabType, label: 'Proveedores', icon: Users, count: suppliers.length },
@@ -37,6 +73,17 @@ export function PurchaseManagement({ products, onUpdateProducts, suppliers, onUp
     { id: 'invoices' as TabType, label: 'Facturas', icon: FileText, count: invoices.length },
     { id: 'payables' as TabType, label: 'Cuentas por Pagar', icon: CreditCard, count: payables.length },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#EC0000] mx-auto mb-4"></div>
+          <p className="text-gray-600 font-bold">Cargando módulo de compras...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-gray-50">

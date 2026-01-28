@@ -118,6 +118,24 @@ export default function App() {
     enabled: !!currentUser && !isSessionLocked,
   });
 
+  // Cargar proveedores al iniciar sesión
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const loadSuppliers = async () => {
+      try {
+        const { purchaseService } = await import('@/services');
+        const suppliersData = await purchaseService.getSuppliers();
+        setSuppliers(suppliersData);
+      } catch (error) {
+        console.error('Error al cargar proveedores:', error);
+        // No mostrar toast para no interrumpir la experiencia
+      }
+    };
+
+    loadSuppliers();
+  }, [currentUser]);
+
   // Detectar intentos de acceso no autorizado
   useEffect(() => {
     if (!currentUser) return;

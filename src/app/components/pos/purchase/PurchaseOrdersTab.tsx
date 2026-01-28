@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, Plus, Eye, Send, X, Save, AlertTriangle, CheckCircle, XCircle, Clock, Grid3x3, List, Package } from 'lucide-react';
 import { toast } from 'sonner';
+import { purchaseService } from '@/services';
 import type { PurchaseOrder, PurchaseOrderItem, Supplier, Product, PurchaseOrderStatus } from '@/types/pos';
 
 interface PurchaseOrdersTabProps {
@@ -112,7 +113,7 @@ export function PurchaseOrdersTab({
     return orderItems.reduce((sum, item) => sum + item.quantity, 0);
   };
 
-  const handleCreateOrder = () => {
+  const handleCreateOrder = async () => {
     if (!selectedSupplier) {
       toast.error('Selecciona un proveedor');
       return;
@@ -139,30 +140,50 @@ export function PurchaseOrdersTab({
       createdBy: 'Usuario',
     };
 
-    onUpdatePurchaseOrders([...purchaseOrders, newOrder]);
-    toast.success(`Orden de compra ${orderNumber} creada`);
-    handleCloseModal();
+    try {
+      const savedOrder = await purchaseService.createPurchaseOrder(newOrder);
+      onUpdatePurchaseOrders([...purchaseOrders, savedOrder]);
+      toast.success(`Orden de compra ${orderNumber} creada`);
+      handleCloseModal();
+    } catch (error) {
+      console.error('Error al crear orden:', error);
+      toast.error('Error al crear la orden de compra');
+    }
   };
 
-  const handleSendOrder = (order: PurchaseOrder) => {
-    const updated = purchaseOrders.map(o =>
-      o.id === order.id
-        ? { ...o, status: 'sent' as PurchaseOrderStatus, sentAt: new Date() }
-        : o
-    );
-    onUpdatePurchaseOrders(updated);
-    toast.success(`Orden ${order.orderNumber} enviada al proveedor`);
-  };
-
-  const handleCancelOrder = (order: PurchaseOrder) => {
-    if (window.confirm(`¿Cancelar la orden ${order.orderNumber}?`)) {
+  const handleSendOrder = async (order: PurchaseOrder) => {
+    try {
+      await purchaseService.updatePurchaseOrderStatus(order.id, 'sent');
+      
       const updated = purchaseOrders.map(o =>
         o.id === order.id
-          ? { ...o, status: 'cancelled' as PurchaseOrderStatus }
+          ? { ...o, status: 'sent' as PurchaseOrderStatus, sentAt: new Date() }
           : o
       );
       onUpdatePurchaseOrders(updated);
-      toast.success(`Orden ${order.orderNumber} cancelada`);
+      toast.success(`Orden ${order.orderNumber} enviada al proveedor`);
+    } catch (error) {
+      console.error('Error al enviar orden:', error);
+      toast.error('Error al enviar la orden');
+    }
+  };
+
+  const handleCancelOrder = async (order: PurchaseOrder) => {
+    if (window.confirm(`¿Cancelar la orden ${order.orderNumber}?`)) {
+      try {
+        await purchaseService.updatePurchaseOrderStatus(order.id, 'cancelled');
+        
+        const updated = purchaseOrders.map(o =>
+          o.id === order.id
+            ? { ...o, status: 'cancelled' as PurchaseOrderStatus }
+            : o
+        );
+        onUpdatePurchaseOrders(updated);
+        toast.success(`Orden ${order.orderNumber} cancelada`);
+      } catch (error) {
+        console.error('Error al cancelar orden:', error);
+        toast.error('Error al cancelar la orden');
+      }
     }
   };
 

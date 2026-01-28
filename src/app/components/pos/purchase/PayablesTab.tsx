@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, CreditCard, DollarSign, X, Save, AlertTriangle, CheckCircle, Clock, Grid3x3, List } from 'lucide-react';
 import { toast } from 'sonner';
+import { purchaseService } from '@/services';
 import type { PayableAccount, Supplier } from '@/types/pos';
 
 interface PayablesTabProps {
@@ -39,7 +40,7 @@ export function PayablesTab({ payables, onUpdatePayables, suppliers }: PayablesT
     setSelectedPayable(null);
   };
 
-  const handleSavePayment = () => {
+  const handleSavePayment = async () => {
     if (!selectedPayable) return;
 
     if (paymentAmount <= 0) {
@@ -52,40 +53,52 @@ export function PayablesTab({ payables, onUpdatePayables, suppliers }: PayablesT
       return;
     }
 
-    const newPayment = {
-      id: Math.random().toString(36).substr(2, 9),
-      amount: paymentAmount,
-      date: new Date(),
-      method: 'cash' as const,
-      notes: paymentNotes || undefined,
-    };
+    try {
+      // Registrar pago en backend
+      await purchaseService.recordPayablePayment(selectedPayable.id, {
+        amount: paymentAmount,
+        paymentMethod: 'cash',
+        notes: paymentNotes || undefined,
+      });
 
-    const newAmountPaid = selectedPayable.amountPaid + paymentAmount;
-    const newBalance = selectedPayable.balance - paymentAmount;
-    const newStatus = newBalance === 0 ? 'paid' : newBalance < selectedPayable.amount ? 'partial' : 'pending';
+      const newPayment = {
+        id: Math.random().toString(36).substr(2, 9),
+        amount: paymentAmount,
+        date: new Date(),
+        method: 'cash' as const,
+        notes: paymentNotes || undefined,
+      };
 
-    const updated = payables.map(p =>
-      p.id === selectedPayable.id
-        ? {
-            ...p,
-            amountPaid: newAmountPaid,
-            balance: newBalance,
-            status: newStatus as 'pending' | 'partial' | 'paid' | 'overdue',
-            notes: paymentNotes || p.notes,
-            paymentHistory: [...p.paymentHistory, newPayment],
-          }
-        : p
-    );
+      const newAmountPaid = selectedPayable.amountPaid + paymentAmount;
+      const newBalance = selectedPayable.balance - paymentAmount;
+      const newStatus = newBalance === 0 ? 'paid' : newBalance < selectedPayable.amount ? 'partial' : 'pending';
 
-    onUpdatePayables(updated);
+      const updated = payables.map(p =>
+        p.id === selectedPayable.id
+          ? {
+              ...p,
+              amountPaid: newAmountPaid,
+              balance: newBalance,
+              status: newStatus as 'pending' | 'partial' | 'paid' | 'overdue',
+              notes: paymentNotes || p.notes,
+              paymentHistory: [...p.paymentHistory, newPayment],
+            }
+          : p
+      );
 
-    if (newBalance === 0) {
-      toast.success(`Cuenta saldada completamente - ${selectedPayable.invoiceNumber}`);
-    } else {
-      toast.success(`Pago registrado - Saldo restante: ${formatCurrency(newBalance)}`);
+      onUpdatePayables(updated);
+
+      if (newBalance === 0) {
+        toast.success(`Cuenta saldada completamente - ${selectedPayable.invoiceNumber}`);
+      } else {
+        toast.success(`Pago registrado - Saldo restante: ${formatCurrency(newBalance)}`);
+      }
+
+      handleClosePaymentModal();
+    } catch (error) {
+      console.error('Error al registrar pago:', error);
+      toast.error('Error al registrar el pago');
     }
-
-    handleClosePaymentModal();
   };
 
   const getStatusBadge = (status: 'pending' | 'partial' | 'paid' | 'overdue', dueDate: Date) => {

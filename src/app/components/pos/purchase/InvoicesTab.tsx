@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, Plus, FileText, X, Save, AlertTriangle, CheckCircle, Clock, Grid3x3, List } from 'lucide-react';
 import { toast } from 'sonner';
+import { purchaseService } from '@/services';
 import type { SupplierInvoice, Supplier, PurchaseOrder, PayableAccount, InvoiceStatus } from '@/types/pos';
 
 interface InvoicesTabProps {
@@ -77,7 +78,7 @@ export function InvoicesTab({
     });
   };
 
-  const handleSaveInvoice = () => {
+  const handleSaveInvoice = async () => {
     if (!formData.invoiceNumber.trim()) {
       toast.error('El número de factura es obligatorio');
       return;
@@ -107,38 +108,55 @@ export function InvoicesTab({
       notes: formData.notes || undefined,
     };
 
-    onUpdateInvoices([...invoices, newInvoice]);
+    try {
+      // Guardar factura en backend
+      const savedInvoice = await purchaseService.createSupplierInvoice(newInvoice);
+      onUpdateInvoices([...invoices, savedInvoice]);
 
-    // Crear cuenta por pagar
-    const newPayable: PayableAccount = {
-      id: Math.random().toString(36).substr(2, 9),
-      supplierId: supplier.id,
-      supplierName: supplier.name,
-      invoiceId: newInvoice.id,
-      invoiceNumber: newInvoice.invoiceNumber,
-      amount: newInvoice.amount,
-      amountPaid: 0,
-      balance: newInvoice.amount,
-      status: 'pending',
-      dueDate: newInvoice.dueDate,
-      notes: newInvoice.notes,
-      paymentHistory: [],
-    };
+      // Crear cuenta por pagar (esto debería hacerlo automáticamente el backend)
+      const newPayable: PayableAccount = {
+        id: Math.random().toString(36).substr(2, 9),
+        supplierId: supplier.id,
+        supplierName: supplier.name,
+        invoiceId: savedInvoice.id,
+        invoiceNumber: savedInvoice.invoiceNumber,
+        amount: savedInvoice.amount,
+        amountPaid: 0,
+        balance: savedInvoice.amount,
+        status: 'pending',
+        dueDate: savedInvoice.dueDate,
+        notes: savedInvoice.notes,
+        paymentHistory: [],
+      };
 
-    onCreatePayable(newPayable);
+      onCreatePayable(newPayable);
 
-    toast.success(`Factura ${formData.invoiceNumber} registrada`);
-    handleCloseModal();
+      toast.success(`Factura ${formData.invoiceNumber} registrada`);
+      handleCloseModal();
+    } catch (error) {
+      console.error('Error al guardar factura:', error);
+      toast.error('Error al guardar la factura');
+    }
   };
 
-  const handleMarkPaid = (invoice: SupplierInvoice) => {
-    const updated = invoices.map(inv =>
-      inv.id === invoice.id
-        ? { ...inv, status: 'paid' as InvoiceStatus, paidDate: new Date() }
-        : inv
-    );
-    onUpdateInvoices(updated);
-    toast.success(`Factura ${invoice.invoiceNumber} marcada como pagada`);
+  const handleMarkPaid = async (invoice: SupplierInvoice) => {
+    try {
+      const updatedInvoice = {
+        ...invoice,
+        status: 'paid' as InvoiceStatus,
+      };
+      
+      await purchaseService.updateSupplierInvoice(invoice.id, updatedInvoice);
+      
+      const updated = invoices.map(inv =>
+        inv.id === invoice.id ? updatedInvoice : inv
+      );
+      onUpdateInvoices(updated);
+      toast.success(`Factura ${invoice.invoiceNumber} marcada como pagada`);
+    } catch (error) {
+      console.error('Error al actualizar factura:', error);
+      toast.error('Error al actualizar la factura');
+    }
   };
 
   const getStatusBadge = (status: InvoiceStatus, dueDate: Date) => {
