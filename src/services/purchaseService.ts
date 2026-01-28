@@ -88,17 +88,65 @@ class PurchaseService {
     
     const query = params.toString() ? `?${params.toString()}` : '';
     const response = await apiClient.get<any[]>(`/receipts${query}`);
-    return transformMongoDoc(response.data || []);
+    const receipts = transformMongoDoc(response.data || []);
+    
+    // Transformar los nombres de campos del backend al frontend
+    return receipts.map((receipt: any) => {
+      if (receipt.items) {
+        receipt.items = receipt.items.map((item: any) => ({
+          ...item,
+          receivedQuantity: item.quantityReceived,
+          orderedQuantity: item.quantityOrdered,
+        }));
+      }
+      // Convertir receivedAt a Date si viene como string
+      if (receipt.receivedAt) {
+        receipt.receivedAt = new Date(receipt.receivedAt);
+      }
+      return receipt;
+    });
   }
 
   async getReceiptById(id: string) {
     const response = await apiClient.get<any>(`/receipts/${id}`);
-    return transformMongoDoc(response.data);
+    const transformed = transformMongoDoc(response.data);
+    
+    // Transformar los nombres de campos del backend al frontend
+    if (transformed && transformed.items) {
+      transformed.items = transformed.items.map((item: any) => ({
+        ...item,
+        receivedQuantity: item.quantityReceived,
+        orderedQuantity: item.quantityOrdered,
+      }));
+    }
+    
+    // Convertir receivedAt a Date si viene como string
+    if (transformed && transformed.receivedAt) {
+      transformed.receivedAt = new Date(transformed.receivedAt);
+    }
+    
+    return transformed;
   }
 
   async createReceipt(receipt: any) {
     const response = await apiClient.post<any>('/receipts', receipt);
-    return transformMongoDoc(response.data);
+    const transformed = transformMongoDoc(response.data);
+    
+    // Transformar los nombres de campos del backend al frontend
+    if (transformed && transformed.items) {
+      transformed.items = transformed.items.map((item: any) => ({
+        ...item,
+        receivedQuantity: item.quantityReceived,
+        orderedQuantity: item.quantityOrdered,
+      }));
+    }
+    
+    // Convertir receivedAt a Date si viene como string
+    if (transformed && transformed.receivedAt) {
+      transformed.receivedAt = new Date(transformed.receivedAt);
+    }
+    
+    return transformed;
   }
 
   async updateReceipt(id: string, receipt: any) {

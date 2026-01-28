@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Search, Package, CheckCircle, X, Save, AlertTriangle, Grid3x3, List, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { purchaseService } from '@/services';
+import { apiClient } from '@/lib/apiClient';
 import type { ProductReceipt, ReceiptItem, PurchaseOrder, Product } from '@/types/pos';
 
 interface ReceiptsTabProps {
@@ -109,6 +110,10 @@ export function ReceiptsTab({
 
     const receiptNumber = `REC-${Date.now().toString().slice(-8)}`;
 
+    // Obtener información del usuario actual
+    const currentUser = apiClient.getStoredUser();
+    const receivedByName = currentUser?.name || currentUser?.username || 'Usuario';
+
     // Crear el recibo con los nombres de campos correctos para el backend
     const newReceipt = {
       receiptNumber,
@@ -130,15 +135,13 @@ export function ReceiptsTab({
         };
       }),
       receivedAt: new Date().toISOString(),
-      receivedBy: 'Usuario',
+      receivedBy: receivedByName,                     // Nombre del usuario actual
       notes: notes || '',
     };
 
     try {
       // Guardar recibo en backend
-      console.log('📦 Enviando recibo al backend:', newReceipt);
       const savedReceipt = await purchaseService.createReceipt(newReceipt);
-      console.log('✅ Recibo guardado:', savedReceipt);
       onUpdateReceipts([...receipts, savedReceipt]);
 
       // Actualizar stock de productos
