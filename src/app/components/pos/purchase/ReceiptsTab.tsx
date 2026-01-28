@@ -430,77 +430,153 @@ export function ReceiptsTab({
             </div>
 
             <div className="p-3 sm:p-6 space-y-3 sm:space-y-4 max-h-[calc(100vh-140px)] sm:max-h-[calc(90vh-100px)] overflow-y-auto">
-              {/* Lista ultra-compacta tipo ticket real */}
-              <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden overflow-x-auto">
-                {/* Header de la tabla */}
-                <div className="bg-gray-50 border-b-2 border-gray-200 px-2 sm:px-4 py-2 sm:py-3 sticky top-0 z-10 min-w-[600px]">
-                  <div className="flex items-center gap-1 sm:gap-2 font-bold text-[10px] sm:text-xs text-gray-600 uppercase">
+              {/* Lista responsive - 2 filas en móvil, tabla en desktop */}
+              <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
+                {/* Header - 2 filas en móvil, 1 fila en desktop */}
+                <div className="bg-gray-50 border-b-2 border-gray-200 px-2 sm:px-3 lg:px-4 py-2 sticky top-0 z-10">
+                  {/* Fila 1 - Móvil */}
+                  <div className="md:hidden flex items-center gap-1 font-bold text-[10px] text-gray-600 uppercase mb-1">
                     <div className="flex-1 min-w-0">Producto</div>
-                    <div className="w-8 sm:w-10 text-center shrink-0">Ord.</div>
-                    <div className="w-28 sm:w-32 text-center shrink-0">Recibido</div>
-                    <div className="w-20 sm:w-24 text-center shrink-0">P. C/U</div>
-                    <div className="w-20 sm:w-24 text-right shrink-0">P. Total</div>
+                    <div className="w-9 text-center shrink-0">Ord.</div>
+                    <div className="w-28 text-center shrink-0">Recibido</div>
+                  </div>
+                  {/* Fila 2 - Móvil */}
+                  <div className="md:hidden flex items-center gap-1 font-bold text-[10px] text-gray-600 uppercase">
+                    <div className="flex-1"></div>
+                    <div className="w-[72px] text-center shrink-0">P. C/U</div>
+                    <div className="w-16 text-right shrink-0">P. Total</div>
+                  </div>
+                  {/* Desktop */}
+                  <div className="hidden md:flex items-center gap-2 font-bold text-xs text-gray-600 uppercase">
+                    <div className="flex-1 min-w-0">Producto</div>
+                    <div className="w-12 text-center shrink-0">Ord.</div>
+                    <div className="w-32 lg:w-36 text-center shrink-0">Recibido</div>
+                    <div className="w-24 text-center shrink-0">P. C/U</div>
+                    <div className="w-24 text-right shrink-0">P. Total</div>
                   </div>
                 </div>
 
-                {/* Items - Lista compacta */}
-                <div className="divide-y divide-gray-100 min-w-[600px]">
+                {/* Items - 2 filas en móvil, tabla en desktop */}
+                <div className="divide-y divide-gray-100">
                   {receivedItems.map(item => {
                     const totalCost = (item.unitCost || 0) * item.receivedQuantity;
                     return (
-                      <div
-                        key={item.productId}
-                        className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-50 active:bg-gray-50 transition-colors"
-                      >
-                        {/* Nombre del producto - truncado */}
-                        <div className="flex-1 min-w-0">
-                          <div className="font-bold text-gray-900 text-xs sm:text-sm truncate" title={item.productName}>
-                            {item.productName}
+                      <div key={item.productId}>
+                        {/* Diseño de 2 filas para móvil */}
+                        <div className="md:hidden px-2 py-1.5 hover:bg-gray-50 active:bg-gray-50 transition-colors space-y-1">
+                          {/* Fila 1: Producto, Ord, Recibido */}
+                          <div className="flex items-center gap-1">
+                            {/* Nombre del producto */}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-bold text-gray-900 text-xs truncate" title={item.productName}>
+                                {item.productName}
+                              </div>
+                            </div>
+
+                            {/* Cantidad ordenada */}
+                            <div className="w-9 text-center shrink-0">
+                              <span className="text-xs font-bold text-gray-600">{item.orderedQuantity}</span>
+                            </div>
+
+                            {/* Cantidad recibida con botones +/- */}
+                            <div className="w-28 flex items-center justify-center gap-0.5 shrink-0">
+                              <button
+                                onClick={() => handleUpdateReceivedQuantity(item.productId, Math.max(0, item.receivedQuantity - 1))}
+                                className="w-7 h-7 flex items-center justify-center bg-red-100 active:bg-red-200 text-red-700 rounded font-bold text-base transition-all active:scale-95"
+                              >
+                                -
+                              </button>
+                              <div className="w-11 h-7 px-1 bg-gray-50 border-2 border-gray-200 rounded flex items-center justify-center font-bold text-xs text-gray-900">
+                                {item.receivedQuantity}
+                              </div>
+                              <button
+                                onClick={() => handleUpdateReceivedQuantity(item.productId, item.receivedQuantity + 1)}
+                                className="w-7 h-7 flex items-center justify-center bg-green-100 active:bg-green-200 text-green-700 rounded font-bold text-base transition-all active:scale-95"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Fila 2: Precio C/U, Precio Total */}
+                          <div className="flex items-center gap-1">
+                            {/* Espacio vacío para alinear */}
+                            <div className="flex-1"></div>
+
+                            {/* Precio C/U */}
+                            <div className="w-[72px] shrink-0">
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={item.unitCost || 0}
+                                onChange={(e) => handleUpdateUnitCost(item.productId, parseFloat(e.target.value) || 0)}
+                                className="w-full h-7 px-1 bg-blue-50 border-2 border-blue-200 rounded text-center font-bold text-[11px] text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                placeholder="0.00"
+                              />
+                            </div>
+
+                            {/* Precio Total */}
+                            <div className="w-16 text-right shrink-0">
+                              <span className="text-xs font-bold text-green-700">
+                                ${totalCost.toFixed(2)}
+                              </span>
+                            </div>
                           </div>
                         </div>
 
-                        {/* Cantidad ordenada */}
-                        <div className="w-8 sm:w-10 text-center shrink-0">
-                          <span className="text-xs sm:text-sm font-bold text-gray-600">{item.orderedQuantity}</span>
-                        </div>
-
-                        {/* Cantidad recibida con botones +/- ultra compactos */}
-                        <div className="w-28 sm:w-32 flex items-center justify-center gap-1 shrink-0">
-                          <button
-                            onClick={() => handleUpdateReceivedQuantity(item.productId, Math.max(0, item.receivedQuantity - 1))}
-                            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-red-100 active:bg-red-200 text-red-700 rounded font-bold text-sm sm:text-base transition-all active:scale-95"
-                          >
-                            -
-                          </button>
-                          <div className="w-10 sm:w-12 h-7 sm:h-8 px-1 bg-gray-50 border-2 border-gray-200 rounded flex items-center justify-center font-bold text-xs sm:text-sm text-gray-900">
-                            {item.receivedQuantity}
+                        {/* Diseño de tabla para tablet+ */}
+                        <div className="hidden md:flex items-center gap-2 px-3 lg:px-4 py-2 hover:bg-gray-50 active:bg-gray-50 transition-colors">
+                          {/* Nombre del producto */}
+                          <div className="flex-1 min-w-0">
+                            <div className="font-bold text-gray-900 text-sm truncate" title={item.productName}>
+                              {item.productName}
+                            </div>
                           </div>
-                          <button
-                            onClick={() => handleUpdateReceivedQuantity(item.productId, item.receivedQuantity + 1)}
-                            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-green-100 active:bg-green-200 text-green-700 rounded font-bold text-sm sm:text-base transition-all active:scale-95"
-                          >
-                            +
-                          </button>
-                        </div>
 
-                        {/* Precio C/U */}
-                        <div className="w-20 sm:w-24 shrink-0">
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={item.unitCost || 0}
-                            onChange={(e) => handleUpdateUnitCost(item.productId, parseFloat(e.target.value) || 0)}
-                            className="w-full h-7 sm:h-8 px-1 sm:px-2 bg-blue-50 border-2 border-blue-200 rounded text-center font-bold text-xs sm:text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                            placeholder="0.00"
-                          />
-                        </div>
+                          {/* Cantidad ordenada */}
+                          <div className="w-12 text-center shrink-0">
+                            <span className="text-sm font-bold text-gray-600">{item.orderedQuantity}</span>
+                          </div>
 
-                        {/* Precio Total */}
-                        <div className="w-20 sm:w-24 text-right shrink-0">
-                          <span className="text-xs sm:text-sm font-bold text-green-700">
-                            ${totalCost.toFixed(2)}
-                          </span>
+                          {/* Cantidad recibida con botones +/- */}
+                          <div className="w-32 lg:w-36 flex items-center justify-center gap-1.5 shrink-0">
+                            <button
+                              onClick={() => handleUpdateReceivedQuantity(item.productId, Math.max(0, item.receivedQuantity - 1))}
+                              className="w-8 h-8 flex items-center justify-center bg-red-100 active:bg-red-200 text-red-700 rounded font-bold text-base transition-all active:scale-95"
+                            >
+                              -
+                            </button>
+                            <div className="w-14 lg:w-16 h-8 px-1 bg-gray-50 border-2 border-gray-200 rounded flex items-center justify-center font-bold text-sm text-gray-900">
+                              {item.receivedQuantity}
+                            </div>
+                            <button
+                              onClick={() => handleUpdateReceivedQuantity(item.productId, item.receivedQuantity + 1)}
+                              className="w-8 h-8 flex items-center justify-center bg-green-100 active:bg-green-200 text-green-700 rounded font-bold text-base transition-all active:scale-95"
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          {/* Precio C/U */}
+                          <div className="w-24 shrink-0">
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={item.unitCost || 0}
+                              onChange={(e) => handleUpdateUnitCost(item.productId, parseFloat(e.target.value) || 0)}
+                              className="w-full h-8 px-2 bg-blue-50 border-2 border-blue-200 rounded text-center font-bold text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              placeholder="0.00"
+                            />
+                          </div>
+
+                          {/* Precio Total */}
+                          <div className="w-24 text-right shrink-0">
+                            <span className="text-sm font-bold text-green-700">
+                              ${totalCost.toFixed(2)}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     );
@@ -511,10 +587,10 @@ export function ReceiptsTab({
               {/* Total General */}
               <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl border-2 border-green-300 p-3 sm:p-4">
                 <div className="flex items-center justify-between">
-                  <div className="font-bold text-gray-700 text-sm sm:text-base">
+                  <div className="font-bold text-gray-700 text-xs sm:text-sm">
                     Total Pagado por Mercancía:
                   </div>
-                  <div className="text-xl sm:text-2xl font-bold text-green-700">
+                  <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-700">
                     ${receivedItems.reduce((sum, item) => sum + ((item.unitCost || 0) * item.receivedQuantity), 0).toFixed(2)}
                   </div>
                 </div>
