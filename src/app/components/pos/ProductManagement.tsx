@@ -1022,70 +1022,73 @@ export function ProductManagement({
 
                 {/* COLUMNA DERECHA */}
                 <div className="space-y-4">
-                  {/* Costo */}
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Costo
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.cost || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          cost:
-                            parseFloat(e.target.value) ||
-                            undefined,
-                        })
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all font-medium"
-                      placeholder="0.00"
-                    />
-                  </div>
+                  {/* Costo, Precio y Stock en una fila */}
+                  <div className="grid grid-cols-3 gap-3">
+                    {/* Costo */}
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Costo
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.cost || ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            cost:
+                              parseFloat(e.target.value) ||
+                              undefined,
+                          })
+                        }
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all font-medium"
+                        placeholder="0.00"
+                      />
+                    </div>
 
-                  {/* Precio */}
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Precio *
-                    </label>
-                    <input
-                      type="number"
-                      required
-                      step="0.01"
-                      min="0"
-                      value={formData.price}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          price: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all font-medium"
-                      placeholder="0.00"
-                    />
-                  </div>
+                    {/* Precio */}
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Precio *
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        step="0.01"
+                        min="0"
+                        value={formData.price}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            price: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all font-medium"
+                        placeholder="0.00"
+                      />
+                    </div>
 
-                  {/* Stock Inicial */}
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Stock Inicial *
-                    </label>
-                    <input
-                      type="number"
-                      required
-                      min="0"
-                      value={formData.stock}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          stock: parseInt(e.target.value) || 0,
-                        })
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all font-medium"
-                      placeholder="0"
-                    />
+                    {/* Stock Inicial */}
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Stock Inicial *
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        min="0"
+                        value={formData.stock}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            stock: parseInt(e.target.value) || 0,
+                          })
+                        }
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all font-medium"
+                        placeholder="0"
+                      />
+                    </div>
                   </div>
 
                   {/* URL de imagen */}
