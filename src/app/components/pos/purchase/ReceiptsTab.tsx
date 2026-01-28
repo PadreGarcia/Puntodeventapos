@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Search, Package, CheckCircle, X, Save, AlertTriangle, Grid3x3, List, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { purchaseService } from '@/services';
-import { apiClient } from '@/lib/apiClient';
 import type { ProductReceipt, ReceiptItem, PurchaseOrder, Product } from '@/types/pos';
 
 interface ReceiptsTabProps {
@@ -108,21 +107,11 @@ export function ReceiptsTab({
       return;
     }
 
-    const receiptNumber = `REC-${Date.now().toString().slice(-8)}`;
-
-    // Obtener información del usuario actual
-    const currentUser = apiClient.getStoredUser();
-    
-    // El backend devuelve el campo 'fullName'
-    const receivedByName = currentUser?.fullName || currentUser?.username || 'Usuario';
-
     // Crear el recibo con los nombres de campos correctos para el backend
+    // NOTA: El backend asigna automáticamente receivedBy (ID) y receivedByName (nombre)
+    // desde req.userId y req.user.fullName
     const newReceipt = {
-      receiptNumber,
       purchaseOrderId: selectedOrder.id,
-      purchaseOrderNumber: selectedOrder.orderNumber,
-      supplierId: selectedOrder.supplierId,
-      supplierName: selectedOrder.supplierName,
       items: receivedItems.map(item => {
         const unitCost = item.unitCost || 0;
         const total = unitCost * item.receivedQuantity;
@@ -136,8 +125,6 @@ export function ReceiptsTab({
           isComplete: item.isComplete
         };
       }),
-      receivedAt: new Date().toISOString(),
-      receivedBy: receivedByName,                     // Nombre del usuario actual
       notes: notes || '',
     };
 

@@ -99,10 +99,19 @@ class PurchaseService {
           orderedQuantity: item.quantityOrdered,
         }));
       }
-      // Convertir receivedAt a Date si viene como string
-      if (receipt.receivedAt) {
-        receipt.receivedAt = new Date(receipt.receivedAt);
+      
+      // Mapear receivedDate (backend) a receivedAt (frontend)
+      if (receipt.receivedDate) {
+        receipt.receivedAt = new Date(receipt.receivedDate);
       }
+      
+      // Mapear receivedByName (backend) a receivedBy (frontend para mostrar)
+      // El backend guarda: receivedBy (ID) y receivedByName (nombre)
+      // El frontend muestra: receivedBy (que debería ser el nombre)
+      if (receipt.receivedByName) {
+        receipt.receivedBy = receipt.receivedByName;
+      }
+      
       return receipt;
     });
   }
@@ -120,9 +129,14 @@ class PurchaseService {
       }));
     }
     
-    // Convertir receivedAt a Date si viene como string
-    if (transformed && transformed.receivedAt) {
-      transformed.receivedAt = new Date(transformed.receivedAt);
+    // Mapear receivedDate (backend) a receivedAt (frontend)
+    if (transformed && transformed.receivedDate) {
+      transformed.receivedAt = new Date(transformed.receivedDate);
+    }
+    
+    // Mapear receivedByName (backend) a receivedBy (frontend para mostrar)
+    if (transformed && transformed.receivedByName) {
+      transformed.receivedBy = transformed.receivedByName;
     }
     
     return transformed;
@@ -141,9 +155,14 @@ class PurchaseService {
       }));
     }
     
-    // Convertir receivedAt a Date si viene como string
-    if (transformed && transformed.receivedAt) {
-      transformed.receivedAt = new Date(transformed.receivedAt);
+    // Mapear receivedDate (backend) a receivedAt (frontend)
+    if (transformed && transformed.receivedDate) {
+      transformed.receivedAt = new Date(transformed.receivedDate);
+    }
+    
+    // Mapear receivedByName (backend) a receivedBy (frontend para mostrar)
+    if (transformed && transformed.receivedByName) {
+      transformed.receivedBy = transformed.receivedByName;
     }
     
     return transformed;
