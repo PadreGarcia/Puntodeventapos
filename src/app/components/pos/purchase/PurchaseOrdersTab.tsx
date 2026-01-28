@@ -53,7 +53,6 @@ export function PurchaseOrdersTab({
   };
 
   const handleViewOrder = (order: PurchaseOrder) => {
-    console.log('👁️ Ver detalles de orden:', order.orderNumber);
     setViewOrder(order);
   };
 
@@ -150,7 +149,6 @@ export function PurchaseOrdersTab({
   };
 
   const handleSendOrder = async (order: PurchaseOrder) => {
-    console.log('📤 Enviando orden:', order.orderNumber);
     try {
       await purchaseService.updatePurchaseOrderStatus(order.id, 'sent');
       
@@ -172,7 +170,6 @@ export function PurchaseOrdersTab({
   };
 
   const handleCancelOrder = async (order: PurchaseOrder) => {
-    console.log('❌ Cancelando orden:', order.orderNumber);
     if (window.confirm(`¿Cancelar la orden ${order.orderNumber}?`)) {
       try {
         await purchaseService.updatePurchaseOrderStatus(order.id, 'cancelled');
@@ -243,7 +240,7 @@ export function PurchaseOrdersTab({
         {/* Header con gradiente */}
         <div className="relative bg-gradient-to-br from-[#EC0000] to-[#C00000] p-5 overflow-hidden">
           {/* Patrón decorativo */}
-          <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
           </div>
@@ -311,10 +308,7 @@ export function PurchaseOrdersTab({
           <div className="pt-4 border-t-2 border-gray-100">
             <div className="flex flex-col gap-2">
               <button
-                onClick={(e) => {
-                  console.log('🖱️ Click en Ver Detalles detectado', e);
-                  handleViewOrder(order);
-                }}
+                onClick={() => handleViewOrder(order)}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-blue-500/30"
               >
                 <Eye className="w-4 h-4" />

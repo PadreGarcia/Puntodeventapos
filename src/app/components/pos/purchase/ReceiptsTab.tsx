@@ -221,7 +221,7 @@ export function ReceiptsTab({
                       {/* Header con gradiente azul */}
                       <div className="relative bg-gradient-to-br from-blue-600 to-blue-700 p-5 overflow-hidden">
                         {/* Patrón decorativo */}
-                        <div className="absolute inset-0 opacity-10">
+                        <div className="absolute inset-0 opacity-10 pointer-events-none">
                           <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
                           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
                         </div>
