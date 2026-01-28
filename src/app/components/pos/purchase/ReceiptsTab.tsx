@@ -403,7 +403,7 @@ export function ReceiptsTab({
       {/* Modal de recibir mercancía */}
       {showModal && selectedOrder && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl my-8">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl my-8">
             <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-6 flex items-center justify-between rounded-t-2xl sticky top-0 z-10">
               <div>
                 <h3 className="text-2xl font-bold">Recibir Mercancía</h3>
@@ -417,96 +417,60 @@ export function ReceiptsTab({
               </button>
             </div>
 
-            <div className="p-6 space-y-6 max-h-[calc(90vh-100px)] overflow-y-auto">
-              {/* Botón recibir todo */}
-              <button
-                onClick={handleReceiveAll}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all active:scale-95"
-              >
-                <CheckCircle className="w-5 h-5" />
-                Marcar Todo Como Recibido
-              </button>
+            <div className="p-6 space-y-4 max-h-[calc(90vh-100px)] overflow-y-auto">
+              {/* Tabla tipo ticket */}
+              <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
+                {/* Header de la tabla */}
+                <div className="bg-gray-50 border-b-2 border-gray-200">
+                  <div className="grid grid-cols-12 gap-2 px-4 py-3 font-bold text-sm text-gray-700">
+                    <div className="col-span-6">Producto</div>
+                    <div className="col-span-2 text-center">Ordenado</div>
+                    <div className="col-span-4 text-center">Recibido</div>
+                  </div>
+                </div>
 
-              {/* Items */}
-              <div className="space-y-2">
-                {receivedItems.map(item => (
-                  <div
-                    key={item.productId}
-                    className={`bg-white rounded-lg p-4 border-2 transition-all ${
-                      item.isComplete
-                        ? 'border-green-300 bg-green-50'
-                        : 'border-gray-200'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="flex-1">
-                        <h4 className="font-bold text-gray-900">{item.productName}</h4>
-                        <p className="text-sm text-gray-600">
-                          Ordenado: <span className="font-bold">{item.orderedQuantity}</span>
-                        </p>
+                {/* Items */}
+                <div className="divide-y divide-gray-200">
+                  {receivedItems.map(item => (
+                    <div
+                      key={item.productId}
+                      className="grid grid-cols-12 gap-2 px-4 py-3 items-center hover:bg-gray-50 transition-colors"
+                    >
+                      {/* Nombre del producto */}
+                      <div className="col-span-6">
+                        <div className="font-bold text-gray-900 text-sm">{item.productName}</div>
                       </div>
-                      {item.isComplete && (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
-                          <CheckCircle className="w-3 h-3" />
-                          Completo
-                        </span>
-                      )}
-                    </div>
 
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1">
-                        <label className="block text-sm font-bold text-gray-700 mb-2">
-                          Cantidad Recibida
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          max={item.orderedQuantity}
-                          value={item.receivedQuantity}
-                          onChange={(e) => handleUpdateReceivedQuantity(item.productId, parseInt(e.target.value) || 0)}
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-600 focus:border-green-600 outline-none text-center font-bold text-lg"
-                        />
+                      {/* Cantidad ordenada */}
+                      <div className="col-span-2 text-center">
+                        <span className="text-sm font-bold text-gray-600">{item.orderedQuantity}</span>
                       </div>
-                      <button
-                        onClick={() => handleMarkComplete(item.productId)}
-                        className="mt-6 flex items-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold transition-all active:scale-95"
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                        Completo
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
 
-              {/* Resumen */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-sm text-gray-600 font-bold uppercase mb-1">Total Ordenado</div>
-                    <div className="text-2xl font-bold text-gray-900">{getTotalOrdered()}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-green-600 font-bold uppercase mb-1">Total Recibido</div>
-                    <div className="text-2xl font-bold text-green-600">{getTotalReceived()}</div>
-                  </div>
+                      {/* Cantidad recibida con botones +/- */}
+                      <div className="col-span-4 flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => handleUpdateReceivedQuantity(item.productId, Math.max(0, item.receivedQuantity - 1))}
+                          className="w-8 h-8 flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-bold transition-all active:scale-95"
+                        >
+                          -
+                        </button>
+                        <div className="w-16 px-2 py-1.5 bg-gray-50 border-2 border-gray-200 rounded-lg text-center font-bold text-gray-900">
+                          {item.receivedQuantity}
+                        </div>
+                        <button
+                          onClick={() => handleUpdateReceivedQuantity(item.productId, item.receivedQuantity + 1)}
+                          className="w-8 h-8 flex items-center justify-center bg-green-100 hover:bg-green-200 text-green-700 rounded-lg font-bold transition-all active:scale-95"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Notas */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Notas</label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-600 focus:border-green-600 outline-none font-medium resize-none"
-                  placeholder="Observaciones sobre la recepción..."
-                />
-              </div>
-
               {/* Botones */}
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-3 pt-2">
                 <button
                   onClick={handleCloseModal}
                   className="flex-1 px-6 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-colors"
@@ -517,8 +481,8 @@ export function ReceiptsTab({
                   onClick={handleSaveReceipt}
                   className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl font-bold shadow-lg shadow-green-500/30 transition-all active:scale-95"
                 >
-                  <Save className="w-5 h-5" />
-                  Guardar Recepción
+                  <CheckCircle className="w-5 h-5" />
+                  Confirmar Recepción
                 </button>
               </div>
             </div>
