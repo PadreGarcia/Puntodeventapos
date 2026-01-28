@@ -71,11 +71,9 @@ export function InvoicesTab({
   };
 
   const handleOrderChange = (orderId: string) => {
-    const order = purchaseOrders.find(o => o.id === orderId);
     setFormData({
       ...formData,
       purchaseOrderId: orderId,
-      amount: order?.total || 0,
     });
   };
 
@@ -124,6 +122,7 @@ export function InvoicesTab({
       status: 'pending',
       dueDate: newInvoice.dueDate,
       notes: newInvoice.notes,
+      paymentHistory: [],
     };
 
     onCreatePayable(newPayable);

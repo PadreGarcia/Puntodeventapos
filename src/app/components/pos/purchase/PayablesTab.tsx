@@ -13,7 +13,7 @@ type ViewMode = 'grid' | 'table';
 
 export function PayablesTab({ payables, onUpdatePayables, suppliers }: PayablesTabProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'partial' | 'paid'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'partial' | 'paid' | 'overdue'>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPayable, setSelectedPayable] = useState<PayableAccount | null>(null);
@@ -52,6 +52,14 @@ export function PayablesTab({ payables, onUpdatePayables, suppliers }: PayablesT
       return;
     }
 
+    const newPayment = {
+      id: Math.random().toString(36).substr(2, 9),
+      amount: paymentAmount,
+      date: new Date(),
+      method: 'cash' as const,
+      notes: paymentNotes || undefined,
+    };
+
     const newAmountPaid = selectedPayable.amountPaid + paymentAmount;
     const newBalance = selectedPayable.balance - paymentAmount;
     const newStatus = newBalance === 0 ? 'paid' : newBalance < selectedPayable.amount ? 'partial' : 'pending';
@@ -62,9 +70,9 @@ export function PayablesTab({ payables, onUpdatePayables, suppliers }: PayablesT
             ...p,
             amountPaid: newAmountPaid,
             balance: newBalance,
-            status: newStatus as 'pending' | 'partial' | 'paid',
-            paidDate: newStatus === 'paid' ? new Date() : p.paidDate,
+            status: newStatus as 'pending' | 'partial' | 'paid' | 'overdue',
             notes: paymentNotes || p.notes,
+            paymentHistory: [...p.paymentHistory, newPayment],
           }
         : p
     );
@@ -80,8 +88,8 @@ export function PayablesTab({ payables, onUpdatePayables, suppliers }: PayablesT
     handleClosePaymentModal();
   };
 
-  const getStatusBadge = (status: 'pending' | 'partial' | 'paid', dueDate: Date) => {
-    const isOverdue = status !== 'paid' && new Date() > dueDate;
+  const getStatusBadge = (status: 'pending' | 'partial' | 'paid' | 'overdue', dueDate: Date) => {
+    const isOverdue = (status === 'pending' || status === 'partial') && new Date() > dueDate;
 
     if (isOverdue) {
       return (

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Search, Package, CheckCircle, X, Save, AlertTriangle, Grid3x3, List, Eye } from 'lucide-react';
 import { toast } from 'sonner';
-import type { ProductReceipt, ReceivedItem, PurchaseOrder, Product } from '@/types/pos';
+import type { ProductReceipt, ReceiptItem, PurchaseOrder, Product } from '@/types/pos';
 
 interface ReceiptsTabProps {
   receipts: ProductReceipt[];
@@ -26,7 +26,7 @@ export function ReceiptsTab({
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null);
-  const [receivedItems, setReceivedItems] = useState<ReceivedItem[]>([]);
+  const [receivedItems, setReceivedItems] = useState<ReceiptItem[]>([]);
   const [notes, setNotes] = useState('');
 
   const filteredReceipts = receipts.filter(receipt =>
@@ -41,7 +41,7 @@ export function ReceiptsTab({
   const handleOpenModal = (order: PurchaseOrder) => {
     setSelectedOrder(order);
     // Inicializar items con cantidad recibida = 0
-    const items: ReceivedItem[] = order.items.map(item => ({
+    const items: ReceiptItem[] = order.items.map(item => ({
       productId: item.productId,
       productName: item.productName,
       orderedQuantity: item.quantity,

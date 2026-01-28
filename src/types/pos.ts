@@ -97,11 +97,11 @@ export interface ProductReceipt {
   id: string;
   receiptNumber: string;
   purchaseOrderId: string;
-  orderNumber: string;
+  purchaseOrderNumber: string;
   supplierId: string;
   supplierName: string;
   items: ReceiptItem[];
-  receivedDate: Date;
+  receivedAt: Date;
   notes?: string;
   receivedBy: string;
 }
@@ -109,10 +109,9 @@ export interface ProductReceipt {
 export interface ReceiptItem {
   productId: string;
   productName: string;
-  quantityOrdered: number;
-  quantityReceived: number;
-  unitCost: number;
-  total: number;
+  orderedQuantity: number;
+  receivedQuantity: number;
+  isComplete: boolean;
 }
 
 export interface SupplierInvoice {
@@ -121,15 +120,15 @@ export interface SupplierInvoice {
   supplierId: string;
   supplierName: string;
   receiptId?: string;
-  items: InvoiceItem[];
-  subtotal: number;
-  tax: number;
-  total: number;
-  invoiceDate: Date;
+  purchaseOrderId?: string;
+  amount: number;
+  issueDate: Date;
   dueDate: Date;
   status: 'pending' | 'paid' | 'overdue' | 'cancelled';
   notes?: string;
 }
+
+export type InvoiceStatus = 'pending' | 'paid' | 'overdue' | 'cancelled';
 
 export interface InvoiceItem {
   productId: string;
@@ -150,6 +149,7 @@ export interface PayableAccount {
   balance: number;
   dueDate: Date;
   status: 'pending' | 'partial' | 'paid' | 'overdue';
+  notes?: string;
   paymentHistory: Payment[];
 }
 
