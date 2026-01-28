@@ -284,7 +284,7 @@ export function ReceiptsTab({
         {/* Header del sidebar */}
         <div className="p-4 bg-white border-b border-gray-200">
           <div className="flex items-center gap-2 mb-3">
-            <Package className="w-5 h-5 text-[#EC0000]" />
+            <Package className="w-5 h-5 text-[#8600C0]" />
             <h3 className="font-bold text-gray-900">Historial</h3>
           </div>
           <div className="text-xs text-gray-600 font-medium mb-3">
@@ -299,7 +299,7 @@ export function ReceiptsTab({
               placeholder="Buscar recepción..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all text-sm"
+              className="w-full pl-9 pr-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#8600C0] focus:border-[#8600C0] outline-none transition-all text-sm"
             />
           </div>
         </div>
@@ -321,10 +321,10 @@ export function ReceiptsTab({
               return (
                 <div
                   key={receipt.id}
-                  className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-[#EC0000]/30 cursor-pointer"
+                  className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-[#8600C0]/30 cursor-pointer"
                 >
-                  {/* Header con gradiente rojo */}
-                  <div className="relative bg-gradient-to-br from-[#EC0000] to-[#C00000] p-3 overflow-hidden">
+                  {/* Header con gradiente morado */}
+                  <div className="relative bg-gradient-to-br from-[#9D00E8] to-[#8600C0] p-3 overflow-hidden">
                     {/* Patrón decorativo */}
                     <div className="absolute inset-0 opacity-10">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-white rounded-full -translate-y-12 translate-x-12"></div>
