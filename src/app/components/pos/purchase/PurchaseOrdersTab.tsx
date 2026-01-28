@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, Plus, X, Save, AlertTriangle, CheckCircle, Package, Clock, Eye, Send, XCircle, FileText, ChevronRight, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { purchaseService } from '@/services';
@@ -26,6 +26,21 @@ export function PurchaseOrdersTab({
   const [orderItems, setOrderItems] = useState<PurchaseOrderItem[]>([]);
   const [notes, setNotes] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
+  const [productSearch, setProductSearch] = useState('');
+  const [showProductSuggestions, setShowProductSuggestions] = useState(false);
+  const productSearchRef = useRef<HTMLDivElement>(null);
+
+  // Cerrar sugerencias al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (productSearchRef.current && !productSearchRef.current.contains(event.target as Node)) {
+        setShowProductSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const filteredOrders = purchaseOrders.filter(order => {
     const matchesSearch = order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -48,12 +63,16 @@ export function PurchaseOrdersTab({
     setOrderItems([]);
     setNotes('');
     setCurrentStep(1);
+    setProductSearch('');
+    setShowProductSuggestions(false);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setViewOrder(null);
     setCurrentStep(1);
+    setProductSearch('');
+    setShowProductSuggestions(false);
   };
 
   const handleNextStep = () => {
@@ -256,6 +275,12 @@ export function PurchaseOrdersTab({
   const supplierProducts = selectedSupplier 
     ? products.filter(p => p.supplierId === selectedSupplier)
     : [];
+  
+  // Filtrar productos por búsqueda
+  const filteredProducts = supplierProducts.filter(product =>
+    product.name.toLowerCase().includes(productSearch.toLowerCase()) &&
+    !orderItems.some(item => item.productId === product.id)
+  );
 
   // Órdenes completadas (recibidas o canceladas) para el historial
   const completedOrders = purchaseOrders.filter(order => 
@@ -581,24 +606,64 @@ export function PurchaseOrdersTab({
               {currentStep === 2 && (
                 <div className="space-y-6">
                   {/* Agregar productos */}
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Agregar Productos</label>
-                    <select
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          handleAddProduct(e.target.value);
-                          e.target.value = '';
-                        }
-                      }}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none font-medium"
-                    >
-                      <option value="">Selecciona un producto</option>
-                      {supplierProducts.map(product => (
-                        <option key={product.id} value={product.id}>
-                          {product.name} - Stock: {product.stock}
-                        </option>
-                      ))}
-                    </select>
+                  <div ref={productSearchRef} className="relative">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Buscar y Agregar Productos</label>
+                    <div className="relative">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="text"
+                        value={productSearch}
+                        onChange={(e) => {
+                          setProductSearch(e.target.value);
+                          setShowProductSuggestions(true);
+                        }}
+                        onFocus={() => setShowProductSuggestions(true)}
+                        placeholder="Escribe para buscar productos..."
+                        className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none font-medium"
+                      />
+                    </div>
+
+                    {/* Sugerencias de productos */}
+                    {showProductSuggestions && productSearch && filteredProducts.length > 0 && (
+                      <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-2xl border-2 border-gray-200 max-h-80 overflow-y-auto">
+                        {filteredProducts.slice(0, 8).map(product => (
+                          <button
+                            key={product.id}
+                            onClick={() => {
+                              handleAddProduct(product.id);
+                              setProductSearch('');
+                              setShowProductSuggestions(false);
+                            }}
+                            className="w-full px-4 py-3 hover:bg-[#EC0000] hover:text-white text-left transition-colors border-b border-gray-100 last:border-0 group"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <p className="font-bold text-gray-900 group-hover:text-white">{product.name}</p>
+                                <p className="text-xs text-gray-500 group-hover:text-white/80 mt-0.5">
+                                  Código: {product.code}
+                                </p>
+                              </div>
+                              <div className="text-right ml-4">
+                                <p className="text-sm font-bold text-gray-700 group-hover:text-white">
+                                  Stock: {product.stock}
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Mensaje si no hay resultados */}
+                    {showProductSuggestions && productSearch && filteredProducts.length === 0 && (
+                      <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-2xl border-2 border-gray-200 p-4">
+                        <p className="text-sm text-gray-500 text-center">
+                          {supplierProducts.length === 0 
+                            ? 'No hay productos de este proveedor' 
+                            : 'No se encontraron productos con ese nombre'}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Items de la orden */}
