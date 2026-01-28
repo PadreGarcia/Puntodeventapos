@@ -491,12 +491,12 @@ export function ReceiptsTab({
                               <div className="relative">
                                 <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
                                 <input
-                                  type="number"
-                                  min="0"
-                                  step="0.01"
+                                  type="text"
+                                  inputMode="decimal"
                                   value={item.unitCost || 0}
                                   onChange={(e) => handleUpdateUnitCost(item.productId, parseFloat(e.target.value) || 0)}
                                   className="w-full h-7 pl-5 pr-2 bg-gray-50 border border-gray-200 rounded text-right text-sm font-semibold focus:border-[#EC0000] focus:ring-1 focus:ring-[#EC0000] outline-none"
+                                  placeholder="0.00"
                                 />
                               </div>
                             </div>
@@ -546,12 +546,12 @@ export function ReceiptsTab({
                           <div className="relative">
                             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
                             <input
-                              type="number"
-                              min="0"
-                              step="0.01"
+                              type="text"
+                              inputMode="decimal"
                               value={item.unitCost || 0}
                               onChange={(e) => handleUpdateUnitCost(item.productId, parseFloat(e.target.value) || 0)}
                               className="w-full h-8 pl-6 pr-2 bg-gray-50 border border-gray-200 rounded text-right font-semibold text-sm focus:border-[#EC0000] focus:ring-1 focus:ring-[#EC0000] outline-none"
+                              placeholder="0.00"
                             />
                           </div>
 
@@ -567,11 +567,11 @@ export function ReceiptsTab({
               </div>
 
               {/* Total General */}
-              <div className="bg-[#EC0000] rounded-lg px-4 py-3 flex items-center justify-between">
-                <div className="text-white font-bold text-sm sm:text-base">
+              <div className="bg-gray-100 border border-gray-300 rounded-lg px-4 py-3 flex items-center justify-between">
+                <div className="text-gray-700 font-bold text-sm sm:text-base">
                   Total Mercancía
                 </div>
-                <div className="text-white font-bold text-xl sm:text-2xl">
+                <div className="text-gray-900 font-bold text-xl sm:text-2xl">
                   ${receivedItems.reduce((sum, item) => sum + ((item.unitCost || 0) * item.receivedQuantity), 0).toFixed(2)}
                 </div>
               </div>
