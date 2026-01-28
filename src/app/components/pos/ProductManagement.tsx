@@ -76,6 +76,7 @@ export function ProductManagement({
     product: Product;
     type: "qr" | "barcode";
   } | null>(null);
+  const [deleteModal, setDeleteModal] = useState<Product | null>(null);
   const [printQuantity, setPrintQuantity] = useState(1);
   const [selectedCategory, setSelectedCategory] =
     useState<string>("all");
@@ -332,19 +333,23 @@ export function ProductManagement({
       return;
     }
 
-    if (
-      confirm(
-        "¿Estás seguro de eliminar este producto? Esta acción no se puede deshacer.",
-      )
-    ) {
-      const product = products.find((p) => p.id === productId);
+    const product = products.find((p) => p.id === productId);
+    if (product) {
+      setDeleteModal(product);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteModal) {
+      const product = deleteModal;
       const updatedProducts = products.filter(
-        (p) => p.id !== productId,
+        (p) => p.id !== product.id,
       );
       onUpdateProducts(updatedProducts);
       toast.success(
-        `Producto "${product?.name}" eliminado correctamente`,
+        `Producto "${product.name}" eliminado correctamente`,
       );
+      setDeleteModal(null);
     }
   };
 
@@ -1354,6 +1359,101 @@ export function ProductManagement({
                   Cerrar
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {deleteModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            {/* Header con alerta */}
+            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 flex items-center gap-4">
+              <div className="p-3 bg-white/20 rounded-xl">
+                <AlertTriangle className="w-8 h-8" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold">
+                  Confirmar Eliminación
+                </h3>
+                <p className="text-red-100 text-sm">
+                  Esta acción no se puede deshacer
+                </p>
+              </div>
+            </div>
+
+            {/* Contenido */}
+            <div className="p-6 space-y-6">
+              {/* Información del producto */}
+              <div className="bg-gray-50 rounded-xl p-4 border-2 border-gray-200">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={deleteModal.image}
+                    alt={deleteModal.name}
+                    className="w-20 h-20 rounded-lg object-cover border-2 border-white shadow-md"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop";
+                    }}
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900 text-lg mb-1">
+                      {deleteModal.name}
+                    </h4>
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <span className="inline-flex px-2.5 py-1 bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold capitalize">
+                        {deleteModal.category}
+                      </span>
+                      {deleteModal.barcode && (
+                        <span className="font-mono text-xs text-gray-600 bg-white px-2 py-1 rounded border border-gray-300">
+                          {deleteModal.barcode}
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-2 flex gap-3 text-sm">
+                      <span className="font-bold text-[#EC0000]">
+                        ${deleteModal.price.toFixed(2)}
+                      </span>
+                      <span className="text-gray-600">
+                        Stock: <span className="font-semibold">{deleteModal.stock}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Advertencia */}
+              <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-amber-800">
+                    <p className="font-bold mb-1">¿Estás completamente seguro?</p>
+                    <p>
+                      Se eliminará permanentemente el producto{" "}
+                      <span className="font-semibold">"{deleteModal.name}"</span>{" "}
+                      del inventario. Esta acción no se puede revertir.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Botones de acción */}
+            <div className="px-6 pb-6 flex gap-3">
+              <button
+                onClick={() => setDeleteModal(null)}
+                className="flex-1 px-6 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-all active:scale-95 border-2 border-gray-300"
+              >
+                Cancelar
+              </button>
+              <button
+                onMouseDown={handleConfirmDelete}
+                className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl shadow-red-500/30 transition-all active:scale-95"
+              >
+                <Trash2 className="w-5 h-5" />
+                Eliminar Producto
+              </button>
             </div>
           </div>
         </div>
