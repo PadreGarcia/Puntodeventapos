@@ -119,6 +119,7 @@ export interface ReceiptItem {
   orderedQuantity: number;
   receivedQuantity: number;
   isComplete: boolean;
+  unitCost?: number; // Precio que pagamos por unidad
 }
 
 export interface SupplierInvoice {
