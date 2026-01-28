@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Plus, Eye, Send, X, Save, AlertTriangle, CheckCircle, XCircle, Clock, Grid3x3, List, Package } from 'lucide-react';
+import { Search, Plus, Eye, Send, X, Save, AlertTriangle, CheckCircle, XCircle, Clock, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { purchaseService } from '@/services';
 import type { PurchaseOrder, PurchaseOrderItem, Supplier, Product, PurchaseOrderStatus } from '@/types/pos';
@@ -11,8 +11,6 @@ interface PurchaseOrdersTabProps {
   products: Product[];
 }
 
-type ViewMode = 'grid' | 'table';
-
 export function PurchaseOrdersTab({ 
   purchaseOrders, 
   onUpdatePurchaseOrders, 
@@ -21,7 +19,6 @@ export function PurchaseOrdersTab({
 }: PurchaseOrdersTabProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<PurchaseOrderStatus | 'all'>('all');
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [showModal, setShowModal] = useState(false);
   const [viewOrder, setViewOrder] = useState<PurchaseOrder | null>(null);
   const [selectedSupplier, setSelectedSupplier] = useState('');
@@ -195,29 +192,18 @@ export function PurchaseOrdersTab({
     }
   };
 
-  const getStatusBadge = (status: PurchaseOrderStatus, compact = false) => {
+  const getStatusBadge = (status: PurchaseOrderStatus) => {
     const badges = {
-      draft: { label: 'Borrador', shortLabel: 'Borr', bg: 'bg-gray-100', text: 'text-gray-700', icon: Clock },
-      sent: { label: 'Enviada', shortLabel: 'Env', bg: 'bg-blue-100', text: 'text-blue-700', icon: Send },
-      received: { label: 'Recibida', shortLabel: 'Rec', bg: 'bg-green-100', text: 'text-green-700', icon: CheckCircle },
-      cancelled: { label: 'Cancelada', shortLabel: 'Canc', bg: 'bg-red-100', text: 'text-red-700', icon: XCircle },
+      draft: { label: 'Borrador', bg: 'bg-gray-500/90', text: 'text-white' },
+      sent: { label: 'Enviada', bg: 'bg-blue-500/90', text: 'text-white' },
+      received: { label: 'Recibida', bg: 'bg-green-500/90', text: 'text-white' },
+      cancelled: { label: 'Cancelada', bg: 'bg-orange-500/90', text: 'text-white' },
     };
     const badge = badges[status];
-    const Icon = badge.icon;
-    
-    if (compact) {
-      return (
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${badge.bg} ${badge.text}`}>
-          <Icon className="w-3 h-3" />
-          {badge.shortLabel}
-        </span>
-      );
-    }
     
     return (
-      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${badge.bg} ${badge.text}`}>
-        <Icon className="w-4 h-4" />
-        {badge.label}
+      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${badge.bg} ${badge.text}`}>
+        ● {badge.label}
       </span>
     );
   };
@@ -245,234 +231,193 @@ export function PurchaseOrdersTab({
     ? products.filter(p => p.supplierId === selectedSupplier)
     : [];
 
-  // Componente de Card de Orden (Sidebar)
-  const OrderCardCompact = ({ order }: { order: PurchaseOrder }) => {
+  // Componente de Card de Orden
+  const OrderCard = ({ order }: { order: PurchaseOrder }) => {
     const totalUnits = order.items.reduce((sum, item) => sum + item.quantity, 0);
     
     return (
-      <div 
-        onClick={() => handleViewOrder(order)}
-        className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all border border-gray-200 p-3 cursor-pointer"
-      >
-        {/* Header */}
-        <div className="flex items-start justify-between mb-2">
-          <div>
-            <h4 className="font-bold text-sm text-gray-900">{order.orderNumber}</h4>
-            <p className="text-xs text-gray-600 mt-0.5">{order.supplierName}</p>
+      <div className="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-[#EC0000]/30">
+        {/* Header con gradiente */}
+        <div className="relative bg-gradient-to-br from-[#EC0000] to-[#C00000] p-5 overflow-hidden">
+          {/* Patrón decorativo */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
           </div>
-          {getStatusBadge(order.status, true)}
-        </div>
-
-        {/* Fecha */}
-        <div className="text-xs text-gray-500 mb-2">
-          {formatDate(order.createdAt)}
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className="bg-blue-50 rounded px-2 py-1.5">
-            <div className="text-[10px] text-blue-600 uppercase font-bold mb-0.5">Items</div>
-            <div className="text-sm font-bold text-blue-900">{order.items.length}</div>
-          </div>
-          <div className="bg-green-50 rounded px-2 py-1.5">
-            <div className="text-[10px] text-green-600 uppercase font-bold mb-0.5">Unidades</div>
-            <div className="text-sm font-bold text-green-900">{totalUnits}</div>
+          
+          <div className="relative flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl flex-shrink-0 group-hover:bg-white/30 transition-colors">
+                <Package className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-white text-lg truncate drop-shadow-sm">{order.orderNumber}</h3>
+                <p className="text-sm text-white/90 truncate mt-0.5">{order.supplierName}</p>
+              </div>
+            </div>
+            
+            {/* Badge de estado */}
+            <div className="flex-shrink-0">
+              {getStatusBadge(order.status)}
+            </div>
           </div>
         </div>
 
-        {/* Creado por */}
-        <div className="mt-2 pt-2 border-t border-gray-100">
-          <div className="text-[10px] text-gray-500 uppercase font-bold mb-0.5">Creado por</div>
-          <div className="text-xs font-semibold text-gray-900 truncate">{order.createdBy}</div>
-        </div>
-      </div>
-    );
-  };
+        {/* Content */}
+        <div className="p-5">
+          {/* Info de la orden */}
+          <div className="space-y-3 mb-4">
+            {/* Fecha de creación */}
+            <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex-shrink-0 w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-4 h-4 text-gray-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-gray-600 font-bold uppercase mb-0.5">Creada</p>
+                <p className="text-sm text-gray-900 font-medium">{formatDate(order.createdAt)}</p>
+              </div>
+            </div>
 
-  // Componente de Card de Orden (Principal - según estado)
-  const OrderCardMain = ({ order }: { order: PurchaseOrder }) => {
-    const getGradientClass = () => {
-      switch (order.status) {
-        case 'draft':
-          return 'from-gray-50 to-gray-100 border-gray-200';
-        case 'sent':
-          return 'from-blue-50 to-blue-100 border-blue-200';
-        case 'received':
-          return 'from-green-50 to-green-100 border-green-200';
-        case 'cancelled':
-          return 'from-red-50 to-red-100 border-red-200';
-        default:
-          return 'from-gray-50 to-gray-100 border-gray-200';
-      }
-    };
+            {/* Items y Unidades - Dos columnas */}
+            <div className="grid grid-cols-2 gap-3">
+              {/* Items */}
+              <div className="flex items-center gap-2 bg-blue-50/50 rounded-xl p-3 border border-blue-100">
+                <div className="flex-shrink-0 w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Package className="w-4 h-4 text-blue-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-blue-600 font-bold uppercase mb-0.5">Items</p>
+                  <p className="text-lg text-gray-900 font-bold">{order.items.length}</p>
+                </div>
+              </div>
 
-    return (
-      <div className={`bg-gradient-to-br ${getGradientClass()} rounded-xl p-4 border-2 hover:shadow-lg transition-all`}>
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <h4 className="font-bold text-gray-900">{order.orderNumber}</h4>
-            <p className="text-sm text-gray-600">{order.supplierName}</p>
+              {/* Unidades */}
+              <div className="flex items-center gap-2 bg-green-50/50 rounded-xl p-3 border border-green-100">
+                <div className="flex-shrink-0 w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-green-600 font-bold uppercase mb-0.5">Unidades</p>
+                  <p className="text-lg text-gray-900 font-bold">{totalUnits}</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-white/80 text-gray-700 shadow-sm">
-            {order.items.length} items
-          </span>
-        </div>
 
-        <div className="text-xs text-gray-500 mb-3">
-          {formatDate(order.createdAt)}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={() => handleViewOrder(order)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-all active:scale-95"
-          >
-            <Eye className="w-4 h-4" />
-            Ver detalles
-          </button>
-          {order.status === 'draft' && (
-            <button
-              onClick={() => handleSendOrder(order)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-bold transition-all active:scale-95"
-            >
-              <Send className="w-4 h-4" />
-              Enviar a proveedor
-            </button>
-          )}
-          {(order.status === 'draft' || order.status === 'sent') && (
-            <button
-              onClick={() => handleCancelOrder(order)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all active:scale-95"
-            >
-              <XCircle className="w-4 h-4" />
-              Cancelar orden
-            </button>
-          )}
+          {/* Footer con botones de acción */}
+          <div className="pt-4 border-t-2 border-gray-100">
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => handleViewOrder(order)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-blue-500/30"
+              >
+                <Eye className="w-4 h-4" />
+                Ver Detalles
+              </button>
+              {order.status === 'draft' && (
+                <button
+                  onClick={() => handleSendOrder(order)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-green-500/30"
+                >
+                  <Send className="w-4 h-4" />
+                  Enviar a Proveedor
+                </button>
+              )}
+              {(order.status === 'draft' || order.status === 'sent') && (
+                <button
+                  onClick={() => handleCancelOrder(order)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl font-bold transition-all active:scale-95"
+                >
+                  <XCircle className="w-4 h-4" />
+                  Cancelar Orden
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     );
   };
 
   return (
-    <div className="flex-1 flex flex-row h-full overflow-hidden">
-      {/* ÁREA PRINCIPAL - Órdenes por Estado */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header del área principal */}
-        <div className="p-4 bg-white border-b border-gray-200">
-          {/* Alerta de Stock Bajo */}
-          {lowStockProducts.length > 0 && (
-            <div className="mb-3 bg-orange-50 border-l-4 border-orange-400 p-3 rounded-lg">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-orange-600" />
-                <p className="text-sm font-bold text-orange-900">
-                  {lowStockProducts.length} producto{lowStockProducts.length !== 1 ? 's' : ''} con stock bajo
-                </p>
-              </div>
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
+      {/* Toolbar */}
+      <div className="p-4 bg-white border-b border-gray-200">
+        {/* Alerta de Stock Bajo */}
+        {lowStockProducts.length > 0 && (
+          <div className="mb-3 bg-orange-50 border-l-4 border-orange-400 p-3 rounded-lg">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-orange-600" />
+              <p className="text-sm font-bold text-orange-900">
+                {lowStockProducts.length} producto{lowStockProducts.length !== 1 ? 's' : ''} con stock bajo
+              </p>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Controles */}
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <div className="text-sm text-gray-600 font-medium">
-              {filteredOrders.length} órden{filteredOrders.length !== 1 ? 'es' : ''}
-            </div>
-
-            <button
-              onClick={handleOpenModal}
-              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#EC0000] to-[#D50000] hover:from-[#D50000] hover:to-[#C00000] text-white rounded-xl font-bold shadow-lg shadow-red-500/30 transition-all active:scale-95 whitespace-nowrap"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="hidden sm:inline">Nueva Orden</span>
-            </button>
+        {/* Controles */}
+        <div className="flex items-center justify-between gap-3 mb-3">
+          <div className="text-sm text-gray-600 font-medium">
+            {filteredOrders.length} de {purchaseOrders.length} órdenes
           </div>
 
-          {/* Filtro de estado */}
+          <button
+            onClick={handleOpenModal}
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#EC0000] to-[#D50000] hover:from-[#D50000] hover:to-[#C00000] text-white rounded-xl font-bold shadow-lg shadow-red-500/30 transition-all active:scale-95 whitespace-nowrap"
+          >
+            <Plus className="w-5 h-5" />
+            <span className="hidden sm:inline">Nueva Orden</span>
+          </button>
+        </div>
+
+        {/* Filtros compactos */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar orden o proveedor..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all font-medium"
+            />
+          </div>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as PurchaseOrderStatus | 'all')}
-            className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all text-sm font-medium bg-white"
+            className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all text-sm font-medium bg-white min-w-[140px]"
           >
             <option value="all">Todos los estados</option>
-            <option value="draft">Borradores</option>
-            <option value="sent">Enviadas</option>
-            <option value="received">Recibidas</option>
-            <option value="cancelled">Canceladas</option>
+            <option value="draft">Borrador</option>
+            <option value="sent">Enviada</option>
+            <option value="received">Recibida</option>
+            <option value="cancelled">Cancelada</option>
           </select>
-        </div>
-
-        {/* Content - Órdenes por estado */}
-        <div className="flex-1 overflow-auto p-4">
-          {filteredOrders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <Package className="w-20 h-20 text-gray-300 mb-4" />
-              <p className="text-xl font-bold text-gray-900 mb-2">No hay órdenes</p>
-              <p className="text-gray-500 mb-6">Crea una nueva orden para comenzar</p>
-              <button
-                onClick={handleOpenModal}
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#EC0000] to-[#D50000] text-white rounded-xl font-bold shadow-lg shadow-red-500/30"
-              >
-                <Plus className="w-5 h-5" />
-                Nueva Orden
-              </button>
-            </div>
-          ) : (
-            <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
-                {statusFilter === 'all' && 'Todas las Órdenes'}
-                {statusFilter === 'draft' && 'Órdenes en Borrador'}
-                {statusFilter === 'sent' && 'Órdenes Enviadas'}
-                {statusFilter === 'received' && 'Órdenes Recibidas'}
-                {statusFilter === 'cancelled' && 'Órdenes Canceladas'}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-                {filteredOrders.map(order => (
-                  <OrderCardMain key={order.id} order={order} />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* SIDEBAR DERECHA - Historial de Órdenes */}
-      <div className="hidden lg:flex lg:w-80 xl:w-96 flex-col border-l border-gray-200 bg-gray-50">
-        {/* Header del sidebar */}
-        <div className="p-4 bg-white border-b border-gray-200">
-          <div className="flex items-center gap-2 mb-3">
-            <Package className="w-5 h-5 text-[#EC0000]" />
-            <h3 className="font-bold text-gray-900">Historial</h3>
+      {/* Contenido */}
+      <div className="flex-1 overflow-auto p-4">
+        {filteredOrders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <Package className="w-20 h-20 text-gray-300 mb-4" />
+            <p className="text-xl font-bold text-gray-900 mb-2">No hay órdenes de compra</p>
+            <p className="text-gray-500 mb-6">Crea una nueva orden para comenzar</p>
+            <button
+              onClick={handleOpenModal}
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#EC0000] to-[#D50000] text-white rounded-xl font-bold shadow-lg shadow-red-500/30"
+            >
+              <Plus className="w-5 h-5" />
+              Nueva Orden
+            </button>
           </div>
-          <div className="text-xs text-gray-600 font-medium mb-3">
-            {purchaseOrders.length} órden{purchaseOrders.length !== 1 ? 'es' : ''} total{purchaseOrders.length !== 1 ? 'es' : ''}
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredOrders.map(order => (
+              <OrderCard key={order.id} order={order} />
+            ))}
           </div>
-          
-          {/* Búsqueda */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Buscar orden..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all text-sm"
-            />
-          </div>
-        </div>
-
-        {/* Lista de órdenes */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
-          {purchaseOrders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center p-4">
-              <Package className="w-12 h-12 text-gray-300 mb-2" />
-              <p className="text-sm font-bold text-gray-900 mb-1">Sin órdenes</p>
-              <p className="text-xs text-gray-500">El historial aparecerá aquí</p>
-            </div>
-          ) : (
-            purchaseOrders.map(order => (
-              <OrderCardCompact key={order.id} order={order} />
-            ))
-          )}
-        </div>
+        )}
       </div>
 
       {/* Modal de crear orden */}
