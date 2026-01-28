@@ -251,8 +251,8 @@ export function PurchaseOrdersTab({
                 <Package className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-white text-lg truncate drop-shadow-sm">{order.orderNumber}</h3>
-                <p className="text-sm text-white/90 truncate mt-0.5">{order.supplierName}</p>
+                <h3 className="font-bold text-white text-lg truncate drop-shadow-sm">{order.supplierName}</h3>
+                <p className="text-sm text-white/90 truncate mt-0.5">{order.orderNumber}</p>
               </div>
             </div>
             
@@ -491,8 +491,8 @@ export function PurchaseOrdersTab({
                           <Package className="w-4 h-4 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-sm text-white truncate drop-shadow-sm">{order.orderNumber}</h4>
-                          <p className="text-xs text-white/90 truncate mt-0.5">{order.supplierName}</p>
+                          <h4 className="font-bold text-sm text-white truncate drop-shadow-sm">{order.supplierName}</h4>
+                          <p className="text-xs text-white/90 truncate mt-0.5">{order.orderNumber}</p>
                         </div>
                       </div>
                       
