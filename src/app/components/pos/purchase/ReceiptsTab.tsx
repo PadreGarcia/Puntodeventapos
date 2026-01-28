@@ -180,7 +180,7 @@ export function ReceiptsTab({
   };
 
   return (
-    <div className="flex-1 flex h-full overflow-hidden">
+    <div className="flex-1 flex flex-row h-full overflow-hidden">
       {/* SIDEBAR IZQUIERDA - Historial de Recepciones (1/5 de la pantalla) */}
       <div className="hidden lg:flex lg:w-80 xl:w-96 flex-col border-r border-gray-200 bg-gray-50">
         {/* Header del sidebar */}
