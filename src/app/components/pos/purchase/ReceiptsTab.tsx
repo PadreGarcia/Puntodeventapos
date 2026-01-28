@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Package, CheckCircle, X, Save, AlertTriangle } from 'lucide-react';
+import { Search, Package, CheckCircle, X, Save, AlertTriangle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { purchaseService } from '@/services';
 import type { ProductReceipt, ReceiptItem, PurchaseOrder, Product } from '@/types/pos';
@@ -305,10 +305,10 @@ export function ReceiptsTab({
         </div>
 
         {/* Lista de recepciones */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
+        <div className="flex-1 overflow-y-auto p-3 space-y-3">
           {filteredReceipts.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center p-4">
-              <Package className="w-12 h-12 text-gray-300 mb-2" />
+              <Package className="w-16 h-16 text-gray-300 mb-3" />
               <p className="text-sm font-bold text-gray-900 mb-1">Sin recepciones</p>
               <p className="text-xs text-gray-500">El historial aparecerá aquí</p>
             </div>
@@ -316,45 +316,85 @@ export function ReceiptsTab({
             filteredReceipts.map(receipt => {
               const totalItems = receipt.items.reduce((sum, item) => sum + item.receivedQuantity, 0);
               const completeItems = receipt.items.filter(item => item.isComplete).length;
+              const isFullyComplete = completeItems === receipt.items.length;
 
               return (
                 <div
                   key={receipt.id}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200 p-3 cursor-pointer hover:border-green-300"
+                  className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-[#EC0000]/30 cursor-pointer"
                 >
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-sm text-gray-900 truncate">{receipt.receiptNumber}</h4>
-                      <p className="text-xs text-gray-600 mt-0.5 truncate">{receipt.supplierName}</p>
+                  {/* Header con gradiente rojo */}
+                  <div className="relative bg-gradient-to-br from-[#EC0000] to-[#C00000] p-3 overflow-hidden">
+                    {/* Patrón decorativo */}
+                    <div className="absolute inset-0 opacity-10">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-white rounded-full -translate-y-12 translate-x-12"></div>
+                      <div className="absolute bottom-0 left-0 w-16 h-16 bg-white rounded-full translate-y-8 -translate-x-8"></div>
                     </div>
-                    <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-500/90 text-white">
-                      <CheckCircle className="w-3 h-3" />
-                      OK
-                    </span>
+                    
+                    <div className="relative flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg flex-shrink-0 group-hover:bg-white/30 transition-colors">
+                          <Package className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-sm text-white truncate drop-shadow-sm">{receipt.receiptNumber}</h4>
+                          <p className="text-xs text-white/90 truncate mt-0.5">{receipt.supplierName}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Badge de estado */}
+                      <div className="flex-shrink-0">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-sm ${
+                          isFullyComplete 
+                            ? 'bg-green-500/90 text-white' 
+                            : 'bg-yellow-500/90 text-white'
+                        }`}>
+                          {isFullyComplete ? (
+                            <>
+                              <CheckCircle className="w-3 h-3" />
+                              100%
+                            </>
+                          ) : (
+                            <>
+                              <AlertTriangle className="w-3 h-3" />
+                              Parcial
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Fecha */}
-                  <div className="text-xs text-gray-500 mb-2 font-medium">
-                    {formatDate(receipt.receivedAt)}
-                  </div>
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-blue-50 rounded-lg px-2 py-1.5 border border-blue-100">
-                      <div className="text-[10px] text-blue-600 uppercase font-bold mb-0.5">Items</div>
-                      <div className="text-sm font-bold text-blue-900">{totalItems}</div>
+                  {/* Content */}
+                  <div className="p-3">
+                    {/* Fecha */}
+                    <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2 mb-3 border border-gray-100">
+                      <div className="flex-shrink-0 w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <Clock className="w-3.5 h-3.5 text-gray-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] text-gray-600 font-bold uppercase mb-0.5">Recibido</p>
+                        <p className="text-xs text-gray-900 font-medium truncate">{formatDate(receipt.receivedAt)}</p>
+                      </div>
                     </div>
-                    <div className="bg-green-50 rounded-lg px-2 py-1.5 border border-green-100">
-                      <div className="text-[10px] text-green-600 uppercase font-bold mb-0.5">Completo</div>
-                      <div className="text-sm font-bold text-green-900">{completeItems}/{receipt.items.length}</div>
-                    </div>
-                  </div>
 
-                  {/* Recibido por */}
-                  <div className="mt-2 pt-2 border-t border-gray-200">
-                    <div className="text-[10px] text-gray-500 uppercase font-bold mb-0.5">Recibido por</div>
-                    <div className="text-xs font-semibold text-gray-900 truncate">{receipt.receivedBy}</div>
+                    {/* Stats */}
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                      <div className="bg-blue-50/50 rounded-lg px-2 py-1.5 border border-blue-100">
+                        <div className="text-[10px] text-blue-600 uppercase font-bold mb-0.5">Items</div>
+                        <div className="text-lg font-bold text-blue-900">{totalItems}</div>
+                      </div>
+                      <div className="bg-green-50/50 rounded-lg px-2 py-1.5 border border-green-100">
+                        <div className="text-[10px] text-green-600 uppercase font-bold mb-0.5">Completo</div>
+                        <div className="text-lg font-bold text-green-900">{completeItems}/{receipt.items.length}</div>
+                      </div>
+                    </div>
+
+                    {/* Recibido por */}
+                    <div className="pt-2 border-t-2 border-gray-100">
+                      <div className="text-[10px] text-gray-500 uppercase font-bold mb-1">Recibido por</div>
+                      <div className="text-xs font-bold text-gray-900 truncate">{receipt.receivedBy}</div>
+                    </div>
                   </div>
                 </div>
               );
