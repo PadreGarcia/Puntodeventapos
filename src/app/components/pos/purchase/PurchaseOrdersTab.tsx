@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Plus, X, Save, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Search, Plus, X, Save, AlertTriangle, CheckCircle, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { purchaseService } from '@/services';
 import type { PurchaseOrder, PurchaseOrderItem, Supplier, Product, PurchaseOrderStatus } from '@/types/pos';
