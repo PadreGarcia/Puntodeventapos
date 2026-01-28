@@ -194,94 +194,135 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
             {filteredSuppliers.map(supplier => (
               <div
                 key={supplier.id}
-                className="bg-white rounded-xl shadow-md border-2 border-gray-200 hover:border-[#EC0000] transition-all overflow-hidden"
+                className="bg-white rounded-2xl shadow-lg border-2 border-gray-100 hover:border-[#EC0000] hover:shadow-xl transition-all duration-300 overflow-hidden group"
               >
-                {/* Header */}
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-b border-gray-200">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <div className="bg-gradient-to-br from-[#EC0000] to-[#D50000] p-2.5 rounded-lg flex-shrink-0">
-                        <Building2 className="w-5 h-5 text-white" />
+                {/* Header con gradiente corporativo */}
+                <div className="bg-gradient-to-r from-[#EC0000] to-[#D50000] p-5 relative overflow-hidden">
+                  {/* Patrón decorativo */}
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
+                  </div>
+                  
+                  <div className="relative flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl flex-shrink-0 group-hover:bg-white/30 transition-colors">
+                        <Building2 className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-gray-900 text-lg truncate">{supplier.name}</h3>
-                        <p className="text-sm text-gray-600 truncate">{supplier.contactName}</p>
+                        <h3 className="font-bold text-white text-lg truncate drop-shadow-sm">{supplier.name}</h3>
+                        <p className="text-sm text-white/90 truncate mt-0.5">{supplier.contactName}</p>
                       </div>
                     </div>
-                    <div className="flex gap-1 flex-shrink-0">
-                      <button
-                        onClick={() => handleOpenModal(supplier)}
-                        className="p-2 hover:bg-blue-100 rounded-lg text-blue-600 transition-colors"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(supplier)}
-                        className="p-2 hover:bg-red-100 rounded-lg text-red-600 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    
+                    {/* Badge de estado */}
+                    <div className="flex-shrink-0">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
+                        supplier.status === 'active'
+                          ? 'bg-green-500/90 text-white'
+                          : 'bg-gray-500/90 text-white'
+                      }`}>
+                        {supplier.status === 'active' ? '● Activo' : '○ Inactivo'}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-4 space-y-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <span className="text-gray-700 truncate">{supplier.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <span className="text-gray-700">{supplier.phone}</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700 line-clamp-2">{supplier.address}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <span className="text-gray-700 font-mono">{supplier.taxId}</span>
+                <div className="p-5">
+                  {/* Info de contacto */}
+                  <div className="space-y-3 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0 w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <Mail className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 font-medium mb-0.5">Email</p>
+                        <p className="text-sm text-gray-900 font-medium truncate">{supplier.email}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0 w-9 h-9 bg-green-50 rounded-lg flex items-center justify-center">
+                        <Phone className="w-4 h-4 text-green-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 font-medium mb-0.5">Teléfono</p>
+                        <p className="text-sm text-gray-900 font-bold">{supplier.phone}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center mt-0.5">
+                        <MapPin className="w-4 h-4 text-purple-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 font-medium mb-0.5">Dirección</p>
+                        <p className="text-sm text-gray-900 line-clamp-2 leading-relaxed">{supplier.address}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0 w-9 h-9 bg-orange-50 rounded-lg flex items-center justify-center">
+                        <FileText className="w-4 h-4 text-orange-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 font-medium mb-0.5">RFC</p>
+                        <p className="text-sm text-gray-900 font-mono font-bold">{supplier.taxId}</p>
+                      </div>
+                    </div>
                   </div>
 
+                  {/* Días de visita */}
                   {supplier.visitDays && supplier.visitDays.length > 0 && (
-                    <div className="flex items-start gap-2 text-sm">
-                      <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                      <div className="flex-1">
-                        <span className="text-xs text-gray-500 block mb-1">Días de visita</span>
-                        <div className="flex flex-wrap gap-1">
-                          {supplier.visitDays.map(day => (
-                            <span
-                              key={day}
-                              className="inline-block px-2 py-0.5 bg-[#EC0000]/10 text-[#EC0000] rounded text-xs font-bold"
-                            >
-                              {day.substring(0, 3)}
-                            </span>
-                          ))}
-                        </div>
+                    <div className="mb-4 p-3 bg-gray-50 rounded-xl">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Calendar className="w-4 h-4 text-gray-600" />
+                        <span className="text-xs text-gray-600 font-bold uppercase">Días de visita</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {supplier.visitDays.map(day => (
+                          <span
+                            key={day}
+                            className="inline-flex items-center px-2.5 py-1 bg-[#EC0000] text-white rounded-lg text-xs font-bold shadow-sm"
+                          >
+                            {day.substring(0, 3).toUpperCase()}
+                          </span>
+                        ))}
                       </div>
                     </div>
                   )}
 
-                  <div className="pt-3 border-t border-gray-200 flex items-center justify-between">
-                    <div>
-                      <span className="text-xs text-gray-500 block">Términos de pago</span>
-                      <span className="font-bold text-gray-900">
-                        {supplier.paymentTerms === 0 ? 'Contado' : `${supplier.paymentTerms} días`}
-                      </span>
+                  {/* Footer con stats */}
+                  <div className="pt-4 border-t-2 border-gray-100">
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-3 border border-blue-200">
+                        <div className="text-xs text-blue-700 font-bold uppercase mb-1">Términos</div>
+                        <div className="text-lg font-black text-blue-900">
+                          {supplier.paymentTerms === 0 ? 'Contado' : `${supplier.paymentTerms}d`}
+                        </div>
+                      </div>
+                      <div className="bg-gradient-to-br from-[#EC0000]/10 to-[#EC0000]/20 rounded-xl p-3 border border-[#EC0000]/30">
+                        <div className="text-xs text-[#EC0000] font-bold uppercase mb-1">Productos</div>
+                        <div className="text-lg font-black text-[#EC0000]">{getProductCount(supplier.id)}</div>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-xs text-gray-500 block">Productos</span>
-                      <span className="font-bold text-[#EC0000]">{getProductCount(supplier.id)}</span>
-                    </div>
-                    <div>
-                      <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${
-                        supplier.status === 'active'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        {supplier.status === 'active' ? 'Activo' : 'Inactivo'}
-                      </span>
+
+                    {/* Botones de acción */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleOpenModal(supplier)}
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-blue-500/30"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(supplier)}
+                        className="px-4 py-2.5 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl font-bold transition-all active:scale-95"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 </div>
