@@ -231,12 +231,12 @@ export function PurchaseOrdersTab({
     ? products.filter(p => p.supplierId === selectedSupplier)
     : [];
 
-  // Componente de Card de Orden - Estilo elegante consistente con Proveedores
+  // Componente de Card de Orden - Mismo estilo que Proveedores
   const OrderCard = ({ order }: { order: PurchaseOrder }) => {
     return (
-      <div className="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-[#EC0000]/30">
-        {/* HEADER: Proveedor + Estado con gradiente rojo Santander */}
-        <div className="relative bg-gradient-to-br from-[#EC0000] to-[#C00000] p-5 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-100 hover:border-[#EC0000] hover:shadow-xl transition-all duration-300 overflow-hidden group">
+        {/* Header con gradiente corporativo */}
+        <div className="bg-gradient-to-r from-[#EC0000] to-[#D50000] p-5 relative overflow-hidden">
           {/* Patrón decorativo */}
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
@@ -261,76 +261,77 @@ export function PurchaseOrdersTab({
           </div>
         </div>
 
-        {/* BODY: Info compacta con estilo de tarjetas */}
+        {/* Content */}
         <div className="p-5">
+          {/* Info de la orden */}
           <div className="space-y-3 mb-4">
-            {/* Fecha de creación */}
-            <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
-              <div className="flex-shrink-0 w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-4 h-4 text-gray-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-xs text-gray-600 font-bold uppercase mb-0.5">Creada</p>
-                <p className="text-sm text-gray-900 font-medium">{formatDate(order.createdAt)}</p>
-              </div>
-            </div>
-
-            {/* Total de productos */}
+            {/* Fecha - Línea completa */}
             <div className="flex items-center gap-3 bg-blue-50/50 rounded-xl p-3 border border-blue-100">
               <div className="flex-shrink-0 w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Package className="w-4 h-4 text-blue-600" />
+                <Clock className="w-4 h-4 text-blue-600" />
               </div>
-              <div className="flex-1">
-                <p className="text-xs text-blue-600 font-bold uppercase mb-0.5">Productos</p>
-                <p className="text-lg text-gray-900 font-bold">
-                  {order.items.length} {order.items.length === 1 ? 'producto' : 'productos'}
-                </p>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-blue-600 font-bold uppercase mb-0.5">Fecha de creación</p>
+                <p className="text-sm text-gray-900 font-medium truncate">{formatDate(order.createdAt)}</p>
               </div>
             </div>
 
-            {/* Notas (si existen) */}
-            {order.notes && (
-              <div className="flex items-start gap-3 bg-amber-50/50 rounded-xl p-3 border border-amber-100">
-                <div className="flex-shrink-0 w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-amber-600" />
+            {/* Productos y Notas - Dos columnas (Oculto en móvil) */}
+            <div className="hidden md:grid grid-cols-2 gap-3">
+              {/* Total de productos */}
+              <div className="flex items-center gap-2 bg-green-50/50 rounded-xl p-3 border border-green-100">
+                <div className="flex-shrink-0 w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Package className="w-4 h-4 text-green-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-amber-600 font-bold uppercase mb-0.5">Notas</p>
-                  <p className="text-sm text-gray-700 italic truncate">"{order.notes}"</p>
+                  <p className="text-xs text-green-600 font-bold uppercase mb-0.5">Productos</p>
+                  <p className="text-sm text-gray-900 font-bold truncate">{order.items.length}</p>
                 </div>
               </div>
-            )}
+
+              {/* Notas (placeholder si no hay) */}
+              <div className="flex items-center gap-2 bg-orange-50/50 rounded-xl p-3 border border-orange-100">
+                <div className="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-orange-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-orange-600 font-bold uppercase mb-0.5">Notas</p>
+                  <p className="text-sm text-gray-900 font-medium truncate italic">
+                    {order.notes || 'Sin notas'}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* FOOTER: Botones de acción */}
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={() => handleViewOrder(order)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-blue-500/30"
-            >
-              <Eye className="w-5 h-5" />
-              Ver detalle
-            </button>
-            
-            {order.status === 'draft' && (
+          {/* Footer con botones de acción */}
+          <div className="pt-4 border-t-2 border-gray-100">
+            <div className="flex gap-2">
               <button
-                onClick={() => handleSendOrder(order)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-green-500/30"
+                onClick={() => handleViewOrder(order)}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-blue-500/30"
               >
-                <Send className="w-5 h-5" />
-                Enviar a Proveedor
+                <Eye className="w-4 h-4" />
+                Ver detalle
               </button>
-            )}
-            
-            {(order.status === 'draft' || order.status === 'sent') && (
-              <button
-                onClick={() => handleCancelOrder(order)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl font-bold transition-all active:scale-95"
-              >
-                <XCircle className="w-5 h-5" />
-                Cancelar Orden
-              </button>
-            )}
+              {order.status === 'draft' && (
+                <button
+                  onClick={() => handleSendOrder(order)}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-green-500/30"
+                >
+                  <Send className="w-4 h-4" />
+                  Enviar
+                </button>
+              )}
+              {(order.status === 'draft' || order.status === 'sent') && (
+                <button
+                  onClick={() => handleCancelOrder(order)}
+                  className="px-4 py-2.5 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl font-bold transition-all active:scale-95"
+                >
+                  <XCircle className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
