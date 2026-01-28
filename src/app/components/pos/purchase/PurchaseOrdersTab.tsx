@@ -53,6 +53,7 @@ export function PurchaseOrdersTab({
   };
 
   const handleViewOrder = (order: PurchaseOrder) => {
+    console.log('👁️ Ver detalles de orden:', order.orderNumber);
     setViewOrder(order);
   };
 
@@ -149,6 +150,7 @@ export function PurchaseOrdersTab({
   };
 
   const handleSendOrder = async (order: PurchaseOrder) => {
+    console.log('📤 Enviando orden:', order.orderNumber);
     try {
       await purchaseService.updatePurchaseOrderStatus(order.id, 'sent');
       
@@ -170,6 +172,7 @@ export function PurchaseOrdersTab({
   };
 
   const handleCancelOrder = async (order: PurchaseOrder) => {
+    console.log('❌ Cancelando orden:', order.orderNumber);
     if (window.confirm(`¿Cancelar la orden ${order.orderNumber}?`)) {
       try {
         await purchaseService.updatePurchaseOrderStatus(order.id, 'cancelled');
@@ -308,7 +311,10 @@ export function PurchaseOrdersTab({
           <div className="pt-4 border-t-2 border-gray-100">
             <div className="flex flex-col gap-2">
               <button
-                onClick={() => handleViewOrder(order)}
+                onClick={(e) => {
+                  console.log('🖱️ Click en Ver Detalles detectado', e);
+                  handleViewOrder(order);
+                }}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-blue-500/30"
               >
                 <Eye className="w-4 h-4" />
