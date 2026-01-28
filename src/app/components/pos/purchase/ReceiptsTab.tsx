@@ -432,22 +432,9 @@ export function ReceiptsTab({
             <div className="p-3 sm:p-6 space-y-3 sm:space-y-4 max-h-[calc(100vh-140px)] sm:max-h-[calc(90vh-100px)] overflow-y-auto">
               {/* Lista responsive - 2 filas en móvil, tabla en desktop */}
               <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
-                {/* Header - 2 filas en móvil, 1 fila en desktop */}
-                <div className="bg-gray-50 border-b-2 border-gray-200 px-2 sm:px-3 lg:px-4 py-2 sticky top-0 z-10">
-                  {/* Fila 1 - Móvil */}
-                  <div className="md:hidden flex items-center gap-1 font-bold text-[10px] text-gray-600 uppercase mb-1">
-                    <div className="flex-1 min-w-0">Producto</div>
-                    <div className="w-9 text-center shrink-0">Ord.</div>
-                    <div className="w-28 text-center shrink-0">Recibido</div>
-                  </div>
-                  {/* Fila 2 - Móvil */}
-                  <div className="md:hidden flex items-center gap-1 font-bold text-[10px] text-gray-600 uppercase">
-                    <div className="flex-1"></div>
-                    <div className="w-[72px] text-center shrink-0">P. C/U</div>
-                    <div className="w-16 text-right shrink-0">P. Total</div>
-                  </div>
-                  {/* Desktop */}
-                  <div className="hidden md:flex items-center gap-2 font-bold text-xs text-gray-600 uppercase">
+                {/* Header Desktop */}
+                <div className="hidden md:block bg-gray-50 border-b-2 border-gray-200 px-3 lg:px-4 py-2.5 sticky top-0 z-10">
+                  <div className="flex items-center gap-2 font-bold text-xs text-gray-600 uppercase">
                     <div className="flex-1 min-w-0">Producto</div>
                     <div className="w-12 text-center shrink-0">Ord.</div>
                     <div className="w-32 lg:w-36 text-center shrink-0">Recibido</div>
@@ -456,29 +443,24 @@ export function ReceiptsTab({
                   </div>
                 </div>
 
-                {/* Items - 2 filas en móvil, tabla en desktop */}
+                {/* Items */}
                 <div className="divide-y divide-gray-100">
                   {receivedItems.map(item => {
                     const totalCost = (item.unitCost || 0) * item.receivedQuantity;
                     return (
                       <div key={item.productId}>
                         {/* Diseño de 2 filas para móvil */}
-                        <div className="md:hidden px-2 py-1.5 hover:bg-gray-50 active:bg-gray-50 transition-colors space-y-1">
+                        <div className="md:hidden px-2 py-2 hover:bg-gray-50 active:bg-gray-50 transition-colors">
                           {/* Fila 1: Producto, Ord, Recibido */}
-                          <div className="flex items-center gap-1">
-                            {/* Nombre del producto */}
+                          <div className="flex items-center gap-1 mb-1.5">
                             <div className="flex-1 min-w-0">
                               <div className="font-bold text-gray-900 text-xs truncate" title={item.productName}>
                                 {item.productName}
                               </div>
                             </div>
-
-                            {/* Cantidad ordenada */}
                             <div className="w-9 text-center shrink-0">
                               <span className="text-xs font-bold text-gray-600">{item.orderedQuantity}</span>
                             </div>
-
-                            {/* Cantidad recibida con botones +/- */}
                             <div className="w-28 flex items-center justify-center gap-0.5 shrink-0">
                               <button
                                 onClick={() => handleUpdateReceivedQuantity(item.productId, Math.max(0, item.receivedQuantity - 1))}
@@ -498,13 +480,11 @@ export function ReceiptsTab({
                             </div>
                           </div>
 
-                          {/* Fila 2: Precio C/U, Precio Total */}
-                          <div className="flex items-center gap-1">
-                            {/* Espacio vacío para alinear */}
-                            <div className="flex-1"></div>
-
-                            {/* Precio C/U */}
-                            <div className="w-[72px] shrink-0">
+                          {/* Fila 2: Labels + Precio C/U, Precio Total */}
+                          <div className="flex items-center gap-1 pl-1">
+                            <div className="flex-1 min-w-0"></div>
+                            <div className="w-[72px] shrink-0 flex flex-col gap-0.5">
+                              <label className="text-[9px] text-gray-500 uppercase font-bold text-center">P. C/U</label>
                               <input
                                 type="number"
                                 min="0"
@@ -515,31 +495,27 @@ export function ReceiptsTab({
                                 placeholder="0.00"
                               />
                             </div>
-
-                            {/* Precio Total */}
-                            <div className="w-16 text-right shrink-0">
-                              <span className="text-xs font-bold text-green-700">
-                                ${totalCost.toFixed(2)}
-                              </span>
+                            <div className="w-16 shrink-0 flex flex-col gap-0.5">
+                              <label className="text-[9px] text-gray-500 uppercase font-bold text-right">Total</label>
+                              <div className="h-7 flex items-center justify-end">
+                                <span className="text-xs font-bold text-green-700">
+                                  ${totalCost.toFixed(2)}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
 
                         {/* Diseño de tabla para tablet+ */}
                         <div className="hidden md:flex items-center gap-2 px-3 lg:px-4 py-2 hover:bg-gray-50 active:bg-gray-50 transition-colors">
-                          {/* Nombre del producto */}
                           <div className="flex-1 min-w-0">
                             <div className="font-bold text-gray-900 text-sm truncate" title={item.productName}>
                               {item.productName}
                             </div>
                           </div>
-
-                          {/* Cantidad ordenada */}
                           <div className="w-12 text-center shrink-0">
                             <span className="text-sm font-bold text-gray-600">{item.orderedQuantity}</span>
                           </div>
-
-                          {/* Cantidad recibida con botones +/- */}
                           <div className="w-32 lg:w-36 flex items-center justify-center gap-1.5 shrink-0">
                             <button
                               onClick={() => handleUpdateReceivedQuantity(item.productId, Math.max(0, item.receivedQuantity - 1))}
@@ -557,8 +533,6 @@ export function ReceiptsTab({
                               +
                             </button>
                           </div>
-
-                          {/* Precio C/U */}
                           <div className="w-24 shrink-0">
                             <input
                               type="number"
@@ -570,8 +544,6 @@ export function ReceiptsTab({
                               placeholder="0.00"
                             />
                           </div>
-
-                          {/* Precio Total */}
                           <div className="w-24 text-right shrink-0">
                             <span className="text-sm font-bold text-green-700">
                               ${totalCost.toFixed(2)}
