@@ -30,6 +30,12 @@ export const protect = async (req, res, next) => {
       });
     }
 
+    console.log('✅ Usuario autenticado:', {
+      username: user.username,
+      role: user.role,
+      fullName: user.fullName
+    });
+
     // Agregar usuario a la request
     req.userId = user._id;
     req.user = user;
@@ -50,10 +56,22 @@ export const verifyToken = protect;
 // Middleware para verificar roles
 export const authorize = (...roles) => {
   return (req, res, next) => {
+    console.log('🔒 Verificando autorización:');
+    console.log('  - Roles permitidos:', roles);
+    console.log('  - Usuario:', req.user?.username);
+    console.log('  - Rol del usuario:', req.user?.role);
+    
+    if (!req.user) {
+      return res.status(403).json({
+        success: false,
+        message: 'Usuario no encontrado en la petición'
+      });
+    }
+    
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        message: 'No tienes permisos para realizar esta acción'
+        message: `No tienes permisos para realizar esta acción. Rol requerido: ${roles.join(' o ')}, tu rol: ${req.user.role}`
       });
     }
     next();

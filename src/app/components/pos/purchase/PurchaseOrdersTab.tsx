@@ -153,6 +153,10 @@ export function PurchaseOrdersTab({
 
   const handleSendOrder = async (order: PurchaseOrder) => {
     try {
+      console.log('📤 Intentando enviar orden:', order.orderNumber);
+      console.log('🔑 Token existe:', !!localStorage.getItem('token'));
+      console.log('👤 Usuario guardado:', localStorage.getItem('user'));
+      
       await purchaseService.updatePurchaseOrderStatus(order.id, 'sent');
       
       const updated = purchaseOrders.map(o =>
@@ -162,9 +166,13 @@ export function PurchaseOrdersTab({
       );
       onUpdatePurchaseOrders(updated);
       toast.success(`Orden ${order.orderNumber} enviada al proveedor`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al enviar orden:', error);
-      toast.error('Error al enviar la orden');
+      if (error.message?.includes('permisos')) {
+        toast.error('No tienes permisos para enviar órdenes. Contacta al administrador.');
+      } else {
+        toast.error(error.message || 'Error al enviar la orden');
+      }
     }
   };
 
@@ -180,9 +188,13 @@ export function PurchaseOrdersTab({
         );
         onUpdatePurchaseOrders(updated);
         toast.success(`Orden ${order.orderNumber} cancelada`);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error al cancelar orden:', error);
-        toast.error('Error al cancelar la orden');
+        if (error.message?.includes('permisos')) {
+          toast.error('No tienes permisos para cancelar órdenes. Contacta al administrador.');
+        } else {
+          toast.error(error.message || 'Error al cancelar la orden');
+        }
       }
     }
   };
@@ -259,6 +271,9 @@ export function PurchaseOrdersTab({
         <div className="grid grid-cols-2 gap-2 pt-2">
           <button
             onClick={() => handleViewOrder(order)}
+            onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+            onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-all active:scale-95"
           >
             <Eye className="w-4 h-4" />
@@ -267,6 +282,9 @@ export function PurchaseOrdersTab({
           {order.status === 'draft' && (
             <button
               onClick={() => handleSendOrder(order)}
+              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-all active:scale-95"
             >
               <Send className="w-4 h-4" />
@@ -276,6 +294,9 @@ export function PurchaseOrdersTab({
           {(order.status === 'draft' || order.status === 'sent') && (
             <button
               onClick={() => handleCancelOrder(order)}
+              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all active:scale-95"
             >
               <XCircle className="w-4 h-4" />
