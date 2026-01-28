@@ -429,152 +429,150 @@ export function ReceiptsTab({
               </button>
             </div>
 
-            <div className="p-3 sm:p-6 space-y-3 sm:space-y-4 max-h-[calc(100vh-140px)] sm:max-h-[calc(90vh-100px)] overflow-y-auto">
-              {/* Diseño de cards elegantes */}
-              <div className="space-y-2 sm:space-y-3">
-                {receivedItems.map((item, index) => {
-                  const totalCost = (item.unitCost || 0) * item.receivedQuantity;
-                  const isComplete = item.receivedQuantity === item.orderedQuantity;
-                  
-                  return (
-                    <div
-                      key={item.productId}
-                      className="bg-white rounded-xl shadow-md hover:shadow-lg border-2 border-gray-100 hover:border-green-200 transition-all duration-200"
-                    >
-                      {/* Header del producto */}
-                      <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-3 sm:px-4 py-2 sm:py-2.5 rounded-t-xl border-b-2 border-gray-200">
-                        <div className="flex items-center gap-2">
-                          <div className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-[#EC0000] to-red-700 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md">
-                            {index + 1}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-gray-900 text-sm sm:text-base truncate" title={item.productName}>
-                              {item.productName}
-                            </h4>
-                          </div>
-                          {isComplete && (
-                            <div className="flex items-center gap-1 bg-green-100 px-2 py-1 rounded-lg">
-                              <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
-                              <span className="text-[10px] sm:text-xs font-bold text-green-700">Completo</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+            <div className="p-3 sm:p-6 space-y-3 max-h-[calc(100vh-140px)] sm:max-h-[calc(90vh-100px)] overflow-y-auto">
+              {/* Tabla compacta */}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                {/* Header - solo desktop */}
+                <div className="hidden md:grid md:grid-cols-[1fr_80px_140px_100px_100px] gap-2 bg-gray-50 px-3 py-2 border-b border-gray-200 text-xs font-bold text-gray-600 uppercase sticky top-0">
+                  <div>Producto</div>
+                  <div className="text-center">Ord.</div>
+                  <div className="text-center">Recibido</div>
+                  <div className="text-center">Precio C/U</div>
+                  <div className="text-right">Total</div>
+                </div>
 
-                      {/* Contenido del card */}
-                      <div className="p-3 sm:p-4 space-y-3">
-                        {/* Fila 1: Cantidad ordenada y controles de recibido */}
-                        <div className="grid grid-cols-2 gap-3">
-                          {/* Cantidad Ordenada */}
-                          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-3 border-2 border-blue-200 shadow-sm">
-                            <div className="text-[10px] sm:text-xs text-blue-600 font-bold uppercase mb-1">
-                              Ordenado
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Package className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                              <span className="text-xl sm:text-2xl font-bold text-blue-700">
+                {/* Items */}
+                <div className="divide-y divide-gray-100">
+                  {receivedItems.map(item => {
+                    const totalCost = (item.unitCost || 0) * item.receivedQuantity;
+                    
+                    return (
+                      <div key={item.productId}>
+                        {/* Móvil - diseño compacto */}
+                        <div className="md:hidden p-2.5 space-y-2">
+                          {/* Nombre producto */}
+                          <div className="font-semibold text-gray-900 text-sm">{item.productName}</div>
+                          
+                          {/* Grid 2x2 */}
+                          <div className="grid grid-cols-2 gap-2">
+                            {/* Ordenado */}
+                            <div>
+                              <div className="text-[10px] text-gray-500 uppercase mb-1">Ordenado</div>
+                              <div className="bg-gray-50 rounded px-2 py-1.5 text-center font-bold text-sm text-gray-700">
                                 {item.orderedQuantity}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Cantidad Recibida */}
-                          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-3 border-2 border-green-200 shadow-sm">
-                            <div className="text-[10px] sm:text-xs text-green-600 font-bold uppercase mb-1">
-                              Recibido
-                            </div>
-                            <div className="flex items-center gap-1.5 sm:gap-2">
-                              <button
-                                onClick={() => handleUpdateReceivedQuantity(item.productId, Math.max(0, item.receivedQuantity - 1))}
-                                className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white hover:bg-red-50 border-2 border-red-300 active:border-red-500 text-red-600 rounded-lg font-bold text-lg transition-all active:scale-95 shadow-sm"
-                              >
-                                -
-                              </button>
-                              <div className="flex-1 h-8 sm:h-9 bg-white border-2 border-green-300 rounded-lg flex items-center justify-center">
-                                <span className="text-lg sm:text-xl font-bold text-green-700">
-                                  {item.receivedQuantity}
-                                </span>
                               </div>
-                              <button
-                                onClick={() => handleUpdateReceivedQuantity(item.productId, item.receivedQuantity + 1)}
-                                className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white hover:bg-green-50 border-2 border-green-300 active:border-green-500 text-green-600 rounded-lg font-bold text-lg transition-all active:scale-95 shadow-sm"
-                              >
-                                +
-                              </button>
                             </div>
-                          </div>
-                        </div>
 
-                        {/* Fila 2: Precios */}
-                        <div className="grid grid-cols-2 gap-3">
-                          {/* Precio C/U */}
-                          <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-3 border-2 border-orange-200 shadow-sm">
-                            <div className="text-[10px] sm:text-xs text-orange-600 font-bold uppercase mb-1.5">
-                              Precio C/U
+                            {/* Recibido */}
+                            <div>
+                              <div className="text-[10px] text-gray-500 uppercase mb-1">Recibido</div>
+                              <div className="flex gap-1">
+                                <button
+                                  onClick={() => handleUpdateReceivedQuantity(item.productId, Math.max(0, item.receivedQuantity - 1))}
+                                  className="w-7 h-7 bg-gray-100 hover:bg-[#EC0000] hover:text-white rounded font-bold transition-colors"
+                                >
+                                  -
+                                </button>
+                                <div className="flex-1 bg-gray-50 rounded flex items-center justify-center font-bold text-sm">
+                                  {item.receivedQuantity}
+                                </div>
+                                <button
+                                  onClick={() => handleUpdateReceivedQuantity(item.productId, item.receivedQuantity + 1)}
+                                  className="w-7 h-7 bg-gray-100 hover:bg-[#EC0000] hover:text-white rounded font-bold transition-colors"
+                                >
+                                  +
+                                </button>
+                              </div>
                             </div>
-                            <div className="relative">
-                              <span className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 text-orange-600 font-bold text-sm sm:text-base">
-                                $
-                              </span>
-                              <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                value={item.unitCost || 0}
-                                onChange={(e) => handleUpdateUnitCost(item.productId, parseFloat(e.target.value) || 0)}
-                                className="w-full h-9 sm:h-10 pl-6 sm:pl-8 pr-2 sm:pr-3 bg-white border-2 border-orange-300 rounded-lg text-right font-bold text-base sm:text-lg text-gray-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none shadow-sm"
-                                placeholder="0.00"
-                              />
-                            </div>
-                          </div>
 
-                          {/* Precio Total */}
-                          <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-3 border-2 border-emerald-200 shadow-sm">
-                            <div className="text-[10px] sm:text-xs text-emerald-600 font-bold uppercase mb-1.5">
-                              Total
+                            {/* Precio C/U */}
+                            <div>
+                              <div className="text-[10px] text-gray-500 uppercase mb-1">Precio C/U</div>
+                              <div className="relative">
+                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  value={item.unitCost || 0}
+                                  onChange={(e) => handleUpdateUnitCost(item.productId, parseFloat(e.target.value) || 0)}
+                                  className="w-full h-7 pl-5 pr-2 bg-gray-50 border border-gray-200 rounded text-right text-sm font-semibold focus:border-[#EC0000] focus:ring-1 focus:ring-[#EC0000] outline-none"
+                                />
+                              </div>
                             </div>
-                            <div className="h-9 sm:h-10 bg-white border-2 border-emerald-300 rounded-lg flex items-center justify-center px-2">
-                              <span className="text-lg sm:text-xl font-bold text-emerald-700">
+
+                            {/* Total */}
+                            <div>
+                              <div className="text-[10px] text-gray-500 uppercase mb-1">Total</div>
+                              <div className="bg-gray-50 rounded px-2 py-1.5 text-right font-bold text-sm text-gray-900">
                                 ${totalCost.toFixed(2)}
-                              </span>
+                              </div>
                             </div>
                           </div>
                         </div>
 
-                        {/* Botón de marcar como completo */}
-                        {!isComplete && item.receivedQuantity > 0 && item.receivedQuantity < item.orderedQuantity && (
-                          <button
-                            onClick={() => handleMarkComplete(item.productId)}
-                            className="w-full py-2 bg-gradient-to-r from-green-100 to-green-200 hover:from-green-200 hover:to-green-300 border-2 border-green-300 text-green-700 rounded-lg font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                            Marcar cantidad completa ({item.orderedQuantity})
-                          </button>
-                        )}
+                        {/* Desktop - diseño tabla */}
+                        <div className="hidden md:grid md:grid-cols-[1fr_80px_140px_100px_100px] gap-2 items-center px-3 py-2 hover:bg-gray-50">
+                          {/* Producto */}
+                          <div className="font-semibold text-gray-900 text-sm truncate" title={item.productName}>
+                            {item.productName}
+                          </div>
+
+                          {/* Ordenado */}
+                          <div className="text-center font-bold text-sm text-gray-700">
+                            {item.orderedQuantity}
+                          </div>
+
+                          {/* Recibido */}
+                          <div className="flex gap-1 justify-center">
+                            <button
+                              onClick={() => handleUpdateReceivedQuantity(item.productId, Math.max(0, item.receivedQuantity - 1))}
+                              className="w-7 h-7 bg-gray-100 hover:bg-[#EC0000] hover:text-white rounded font-bold transition-colors"
+                            >
+                              -
+                            </button>
+                            <div className="w-12 bg-gray-50 rounded flex items-center justify-center font-bold text-sm">
+                              {item.receivedQuantity}
+                            </div>
+                            <button
+                              onClick={() => handleUpdateReceivedQuantity(item.productId, item.receivedQuantity + 1)}
+                              className="w-7 h-7 bg-gray-100 hover:bg-[#EC0000] hover:text-white rounded font-bold transition-colors"
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          {/* Precio C/U */}
+                          <div className="relative">
+                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={item.unitCost || 0}
+                              onChange={(e) => handleUpdateUnitCost(item.productId, parseFloat(e.target.value) || 0)}
+                              className="w-full h-8 pl-6 pr-2 bg-gray-50 border border-gray-200 rounded text-right font-semibold text-sm focus:border-[#EC0000] focus:ring-1 focus:ring-[#EC0000] outline-none"
+                            />
+                          </div>
+
+                          {/* Total */}
+                          <div className="text-right font-bold text-sm text-gray-900">
+                            ${totalCost.toFixed(2)}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* Botón para recibir todo */}
-              <button
-                onClick={handleReceiveAll}
-                className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-blue-500/30 transition-all active:scale-95 flex items-center justify-center gap-2"
-              >
-                <CheckCircle className="w-5 h-5" />
-                Marcar todo como recibido completo
-              </button>
-
               {/* Total General */}
-              <div className="bg-gradient-to-r from-[#EC0000] to-red-700 rounded-xl shadow-lg p-4 sm:p-5">
-                <div className="flex items-center justify-between">
-                  <div className="font-bold text-white text-sm sm:text-base">
-                    💰 Total Pagado por Mercancía
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
-                    ${receivedItems.reduce((sum, item) => sum + ((item.unitCost || 0) * item.receivedQuantity), 0).toFixed(2)}
-                  </div>
+              <div className="bg-[#EC0000] rounded-lg px-4 py-3 flex items-center justify-between">
+                <div className="text-white font-bold text-sm sm:text-base">
+                  Total Mercancía
+                </div>
+                <div className="text-white font-bold text-xl sm:text-2xl">
+                  ${receivedItems.reduce((sum, item) => sum + ((item.unitCost || 0) * item.receivedQuantity), 0).toFixed(2)}
                 </div>
               </div>
 
