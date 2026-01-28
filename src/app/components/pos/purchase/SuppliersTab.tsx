@@ -353,19 +353,6 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
                       />
                     </div>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Dirección
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all font-medium"
-                      placeholder="Calle, número, colonia, ciudad"
-                    />
-                  </div>
                 </div>
 
                 {/* COLUMNA IZQUIERDA */}
