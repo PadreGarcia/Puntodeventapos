@@ -57,15 +57,25 @@ export function PurchaseOrdersTab({
   };
 
   const handleNextStep = () => {
-    if (!selectedSupplier) {
-      toast.error('Selecciona un proveedor');
-      return;
+    if (currentStep === 1) {
+      if (!selectedSupplier) {
+        toast.error('Selecciona un proveedor');
+        return;
+      }
+      setCurrentStep(2);
+    } else if (currentStep === 2) {
+      if (orderItems.length === 0) {
+        toast.error('Agrega al menos un producto');
+        return;
+      }
+      setCurrentStep(3);
     }
-    setCurrentStep(2);
   };
 
   const handlePreviousStep = () => {
-    setCurrentStep(1);
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
   };
 
   const handleViewOrder = (order: PurchaseOrder) => {
@@ -491,6 +501,7 @@ export function PurchaseOrdersTab({
               <div className="flex items-center gap-2">
                 <div className={`flex-1 h-2 rounded-full transition-all ${currentStep >= 1 ? 'bg-white' : 'bg-white/30'}`}></div>
                 <div className={`flex-1 h-2 rounded-full transition-all ${currentStep >= 2 ? 'bg-white' : 'bg-white/30'}`}></div>
+                <div className={`flex-1 h-2 rounded-full transition-all ${currentStep >= 3 ? 'bg-white' : 'bg-white/30'}`}></div>
               </div>
               <div className="flex justify-between mt-2">
                 <span className={`text-sm font-bold ${currentStep === 1 ? 'text-white' : 'text-white/60'}`}>
@@ -498,6 +509,9 @@ export function PurchaseOrdersTab({
                 </span>
                 <span className={`text-sm font-bold ${currentStep === 2 ? 'text-white' : 'text-white/60'}`}>
                   2. Productos
+                </span>
+                <span className={`text-sm font-bold ${currentStep === 3 ? 'text-white' : 'text-white/60'}`}>
+                  3. Revisar
                 </span>
               </div>
             </div>
@@ -640,24 +654,6 @@ export function PurchaseOrdersTab({
                         ))}
                       </div>
 
-                      {/* Resumen */}
-                      <div className="mt-4 pt-4 border-t-2 border-gray-200">
-                        <div className="grid grid-cols-2 gap-4 mb-3">
-                          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border-2 border-purple-200">
-                            <p className="text-xs font-bold text-purple-700 uppercase mb-1">Total de productos</p>
-                            <p className="text-3xl font-bold text-purple-900">{orderItems.length}</p>
-                          </div>
-                          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border-2 border-green-200">
-                            <p className="text-xs font-bold text-green-700 uppercase mb-1">Total de unidades</p>
-                            <p className="text-3xl font-bold text-green-900">{getTotalItems()}</p>
-                          </div>
-                        </div>
-                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                          <p className="text-xs font-bold text-blue-700 text-center">
-                            💡 Los costos se registrarán al recibir la mercancía
-                          </p>
-                        </div>
-                      </div>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -668,12 +664,95 @@ export function PurchaseOrdersTab({
                   )}
                 </div>
               )}
+
+              {/* PASO 3: Revisión Final */}
+              {currentStep === 3 && (
+                <div className="space-y-6">
+                  {/* Información del proveedor */}
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-blue-500 p-3 rounded-xl">
+                        <Package className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-bold text-blue-700 uppercase mb-1">Proveedor</p>
+                        <h4 className="font-bold text-gray-900 text-lg">
+                          {suppliers.find(s => s.id === selectedSupplier)?.name}
+                        </h4>
+                      </div>
+                    </div>
+                    {notes && (
+                      <div className="mt-3 p-3 bg-white rounded-lg">
+                        <p className="text-xs font-bold text-gray-600 mb-1">NOTAS:</p>
+                        <p className="text-sm text-gray-800">{notes}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Tabla de productos */}
+                  <div>
+                    <h4 className="font-bold text-gray-900 mb-3 text-lg">Productos a Ordenar</h4>
+                    <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="bg-gradient-to-r from-[#EC0000] to-[#D50000] text-white">
+                              <th className="px-4 py-3 text-left font-bold text-sm">#</th>
+                              <th className="px-4 py-3 text-left font-bold text-sm">Producto</th>
+                              <th className="px-4 py-3 text-center font-bold text-sm">Cantidad</th>
+                              <th className="px-4 py-3 text-center font-bold text-sm">Unidad</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-200">
+                            {orderItems.map((item, index) => (
+                              <tr key={item.productId} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-4 py-4 text-gray-600 font-bold">{index + 1}</td>
+                                <td className="px-4 py-4">
+                                  <p className="font-bold text-gray-900">{item.productName}</p>
+                                </td>
+                                <td className="px-4 py-4 text-center">
+                                  <span className="inline-flex items-center justify-center px-4 py-2 bg-blue-100 text-blue-900 font-bold rounded-lg">
+                                    {item.quantity}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-4 text-center">
+                                  <span className="inline-flex items-center justify-center px-4 py-2 bg-purple-100 text-purple-900 font-bold rounded-lg capitalize">
+                                    {item.unit}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Resumen final */}
+                    <div className="mt-4 grid grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border-2 border-purple-200">
+                        <p className="text-xs font-bold text-purple-700 uppercase mb-1">Total de productos</p>
+                        <p className="text-3xl font-bold text-purple-900">{orderItems.length}</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border-2 border-green-200">
+                        <p className="text-xs font-bold text-green-700 uppercase mb-1">Total de unidades</p>
+                        <p className="text-3xl font-bold text-green-900">{getTotalItems()}</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200">
+                      <p className="text-sm font-bold text-blue-800 text-center">
+                        💡 Los costos se registrarán al recibir la mercancía
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Botones de navegación */}
             <div className="p-6 bg-gray-50 rounded-b-2xl border-t-2 border-gray-200">
               <div className="flex gap-3">
-                {currentStep === 1 ? (
+                {currentStep === 1 && (
                   <>
                     <button
                       onClick={handleCloseModal}
@@ -689,7 +768,28 @@ export function PurchaseOrdersTab({
                       <ChevronRight className="w-5 h-5" />
                     </button>
                   </>
-                ) : (
+                )}
+
+                {currentStep === 2 && (
+                  <>
+                    <button
+                      onClick={handlePreviousStep}
+                      className="px-6 py-3.5 bg-white hover:bg-gray-100 text-gray-700 rounded-xl font-bold transition-colors border-2 border-gray-200 flex items-center gap-2"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                      Anterior
+                    </button>
+                    <button
+                      onClick={handleNextStep}
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-[#EC0000] to-[#D50000] hover:from-[#D50000] hover:to-[#C00000] text-white rounded-xl font-bold shadow-lg shadow-red-500/30 transition-all active:scale-95"
+                    >
+                      Revisar Orden
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+
+                {currentStep === 3 && (
                   <>
                     <button
                       onClick={handlePreviousStep}
