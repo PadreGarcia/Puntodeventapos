@@ -624,45 +624,48 @@ export function PurchaseOrdersTab({
                     </div>
 
                     {/* Sugerencias de productos */}
-                    {showProductSuggestions && productSearch && filteredProducts.length > 0 && (
-                      <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-2xl border-2 border-gray-200 max-h-80 overflow-y-auto">
-                        {filteredProducts.slice(0, 8).map(product => (
-                          <button
-                            key={product.id}
-                            onClick={() => {
-                              handleAddProduct(product.id);
-                              setProductSearch('');
-                              setShowProductSuggestions(false);
-                            }}
-                            className="w-full px-4 py-3 hover:bg-[#EC0000] hover:text-white text-left transition-colors border-b border-gray-100 last:border-0 group"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <p className="font-bold text-gray-900 group-hover:text-white">{product.name}</p>
-                                <p className="text-xs text-gray-500 group-hover:text-white/80 mt-0.5">
-                                  Código: {product.code}
-                                </p>
-                              </div>
-                              <div className="text-right ml-4">
-                                <p className="text-sm font-bold text-gray-700 group-hover:text-white">
-                                  Stock: {product.stock}
-                                </p>
-                              </div>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Mensaje si no hay resultados */}
-                    {showProductSuggestions && productSearch && filteredProducts.length === 0 && (
-                      <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-2xl border-2 border-gray-200 p-4">
-                        <p className="text-sm text-gray-500 text-center">
-                          {supplierProducts.length === 0 
-                            ? 'No hay productos de este proveedor' 
-                            : 'No se encontraron productos con ese nombre'}
-                        </p>
-                      </div>
+                    {showProductSuggestions && (
+                      <>
+                        {filteredProducts.length > 0 ? (
+                          <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-2xl border-2 border-gray-200 max-h-80 overflow-y-auto">
+                            {filteredProducts.map(product => (
+                              <button
+                                key={product.id}
+                                onClick={() => {
+                                  handleAddProduct(product.id);
+                                  setProductSearch('');
+                                  setShowProductSuggestions(false);
+                                }}
+                                className="w-full px-4 py-3 hover:bg-[#EC0000] hover:text-white text-left transition-colors border-b border-gray-100 last:border-0 group"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex-1">
+                                    <p className="font-bold text-gray-900 group-hover:text-white">{product.name}</p>
+                                    <p className="text-xs text-gray-500 group-hover:text-white/80 mt-0.5">
+                                      Código: {product.code}
+                                    </p>
+                                  </div>
+                                  <div className="text-right ml-4">
+                                    <p className="text-sm font-bold text-gray-700 group-hover:text-white">
+                                      Stock: {product.stock}
+                                    </p>
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-2xl border-2 border-gray-200 p-4">
+                            <p className="text-sm text-gray-500 text-center">
+                              {supplierProducts.length === 0 
+                                ? 'No hay productos de este proveedor' 
+                                : productSearch 
+                                  ? 'No se encontraron productos con ese nombre'
+                                  : 'Todos los productos ya están agregados'}
+                            </p>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
 
