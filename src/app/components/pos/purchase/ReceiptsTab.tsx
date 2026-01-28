@@ -402,24 +402,27 @@ export function ReceiptsTab({
 
       {/* Modal de recibir mercancía */}
       {showModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl my-8">
-            <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-6 flex items-center justify-between rounded-t-2xl sticky top-0 z-10">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl my-2 sm:my-8">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-4 sm:p-6 flex items-center justify-between rounded-t-2xl sticky top-0 z-10">
               <div>
-                <h3 className="text-2xl font-bold">Recibir Mercancía</h3>
-                <p className="text-green-100 mt-1">Orden: {selectedOrder.orderNumber} - {selectedOrder.supplierName}</p>
+                <h3 className="text-lg sm:text-2xl font-bold">Recibir Mercancía</h3>
+                <p className="text-green-100 mt-0.5 sm:mt-1 text-xs sm:text-sm">
+                  {selectedOrder.orderNumber} - {selectedOrder.supplierName}
+                </p>
               </div>
               <button
                 onClick={handleCloseModal}
-                className="p-2.5 hover:bg-white/15 rounded-xl transition-colors"
+                className="p-2 sm:p-2.5 hover:bg-white/15 rounded-xl transition-colors"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
 
-            <div className="p-6 space-y-4 max-h-[calc(90vh-100px)] overflow-y-auto">
-              {/* Tabla tipo ticket */}
-              <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
+            <div className="p-3 sm:p-6 space-y-3 sm:space-y-4 max-h-[calc(100vh-140px)] sm:max-h-[calc(90vh-100px)] overflow-y-auto">
+              {/* Tabla tipo ticket - Desktop */}
+              <div className="hidden sm:block bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
                 {/* Header de la tabla */}
                 <div className="bg-gray-50 border-b-2 border-gray-200">
                   <div className="grid grid-cols-12 gap-2 px-4 py-3 font-bold text-sm text-gray-700">
@@ -469,20 +472,62 @@ export function ReceiptsTab({
                 </div>
               </div>
 
+              {/* Cards tipo ticket - Mobile */}
+              <div className="sm:hidden space-y-2">
+                {receivedItems.map(item => (
+                  <div
+                    key={item.productId}
+                    className="bg-white rounded-xl border-2 border-gray-200 p-3 active:bg-gray-50 transition-colors"
+                  >
+                    {/* Nombre y cantidad ordenada */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 pr-2">
+                        <h4 className="font-bold text-gray-900 text-sm leading-tight">{item.productName}</h4>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Ordenado: <span className="font-bold text-gray-900">{item.orderedQuantity}</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Controles de cantidad - Mobile */}
+                    <div className="flex items-center justify-between gap-2 bg-gray-50 rounded-lg p-2">
+                      <span className="text-xs font-bold text-gray-600">Recibido:</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleUpdateReceivedQuantity(item.productId, Math.max(0, item.receivedQuantity - 1))}
+                          className="w-10 h-10 flex items-center justify-center bg-red-100 active:bg-red-200 text-red-700 rounded-lg font-bold text-xl transition-all active:scale-95"
+                        >
+                          -
+                        </button>
+                        <div className="w-16 h-10 px-3 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center font-bold text-lg text-gray-900">
+                          {item.receivedQuantity}
+                        </div>
+                        <button
+                          onClick={() => handleUpdateReceivedQuantity(item.productId, item.receivedQuantity + 1)}
+                          className="w-10 h-10 flex items-center justify-center bg-green-100 active:bg-green-200 text-green-700 rounded-lg font-bold text-xl transition-all active:scale-95"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               {/* Botones */}
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-2 sm:gap-3 pt-2 sticky bottom-0 bg-white pb-2">
                 <button
                   onClick={handleCloseModal}
-                  className="flex-1 px-6 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-colors"
+                  className="flex-1 px-4 sm:px-6 py-3 sm:py-3.5 bg-gray-100 active:bg-gray-200 text-gray-700 rounded-xl font-bold transition-colors text-sm sm:text-base"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleSaveReceipt}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl font-bold shadow-lg shadow-green-500/30 transition-all active:scale-95"
+                  className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-3 sm:py-3.5 bg-gradient-to-r from-green-600 to-green-700 active:from-green-700 active:to-green-800 text-white rounded-xl font-bold shadow-lg shadow-green-500/30 transition-all active:scale-95 text-sm sm:text-base"
                 >
-                  <CheckCircle className="w-5 h-5" />
-                  Confirmar Recepción
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                  Confirmar
                 </button>
               </div>
             </div>
