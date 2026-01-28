@@ -24,8 +24,9 @@ const supplierSchema = new mongoose.Schema({
   },
   address: {
     type: String,
-    required: true,
-    trim: true
+    required: false,
+    trim: true,
+    default: ''
   },
   taxId: {
     type: String,

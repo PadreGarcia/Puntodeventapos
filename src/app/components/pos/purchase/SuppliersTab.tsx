@@ -88,29 +88,43 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
 
     try {
       if (editingSupplier) {
-        // Actualizar
-        const updatedSupplier = {
-          ...formData,
-          id: editingSupplier.id,
-          createdAt: editingSupplier.createdAt,
-        } as Supplier;
+        // Actualizar - Solo enviar campos editables
+        const updateData = {
+          name: formData.name,
+          contactName: formData.contactName,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address || '',
+          taxId: formData.taxId,
+          paymentTerms: formData.paymentTerms || 0,
+          visitDays: formData.visitDays || [],
+          notes: formData.notes || '',
+          status: formData.status || 'active',
+        };
         
-        await purchaseService.updateSupplier(editingSupplier.id, updatedSupplier);
+        const savedSupplier = await purchaseService.updateSupplier(editingSupplier.id, updateData);
         
         const updated = safeSuppliers.map(s => 
-          s.id === editingSupplier.id ? updatedSupplier : s
+          s.id === editingSupplier.id ? savedSupplier : s
         );
         onUpdateSuppliers(updated);
         toast.success('Proveedor actualizado correctamente');
       } else {
-        // Crear nuevo
-        const newSupplier: Supplier = {
-          ...formData,
-          id: Math.random().toString(36).substr(2, 9),
-          createdAt: new Date(),
-        } as Supplier;
+        // Crear nuevo - NO enviar id ni createdAt, MongoDB los genera
+        const newSupplierData = {
+          name: formData.name,
+          contactName: formData.contactName,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address || '',
+          taxId: formData.taxId,
+          paymentTerms: formData.paymentTerms || 0,
+          visitDays: formData.visitDays || [],
+          notes: formData.notes || '',
+          status: formData.status || 'active',
+        };
         
-        const savedSupplier = await purchaseService.createSupplier(newSupplier);
+        const savedSupplier = await purchaseService.createSupplier(newSupplierData);
         
         onUpdateSuppliers([...safeSuppliers, savedSupplier]);
         toast.success('Proveedor creado correctamente');
