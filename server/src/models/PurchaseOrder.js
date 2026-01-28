@@ -14,15 +14,25 @@ const purchaseOrderItemSchema = new mongoose.Schema({
     required: true,
     min: 1
   },
+  unit: {
+    type: String,
+    default: 'pieza'
+  },
+  unitEquivalence: {
+    type: Number
+  },
+  equivalenceUnit: {
+    type: String
+  },
   unitCost: {
     type: Number,
-    required: true,
-    min: 0
+    min: 0,
+    default: 0
   },
   total: {
     type: Number,
-    required: true,
-    min: 0
+    min: 0,
+    default: 0
   }
 });
 
@@ -45,18 +55,18 @@ const purchaseOrderSchema = new mongoose.Schema({
   items: [purchaseOrderItemSchema],
   subtotal: {
     type: Number,
-    required: true,
-    min: 0
+    min: 0,
+    default: 0
   },
   tax: {
     type: Number,
-    required: true,
-    min: 0
+    min: 0,
+    default: 0
   },
   total: {
     type: Number,
-    required: true,
-    min: 0
+    min: 0,
+    default: 0
   },
   status: {
     type: String,

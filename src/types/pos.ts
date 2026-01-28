@@ -80,6 +80,10 @@ export interface PurchaseOrder {
   createdBy: string;
   createdAt: Date;
   sentAt?: Date;
+  // Campos que se llenan al recibir la mercancía
+  subtotal?: number;
+  tax?: number;
+  total?: number;
 }
 
 export type PurchaseOrderStatus = 'draft' | 'sent' | 'pending' | 'approved' | 'received' | 'cancelled';
@@ -91,6 +95,9 @@ export interface PurchaseOrderItem {
   unit: string; // 'caja', 'paquete', 'pieza', 'botella', etc.
   unitEquivalence?: number; // Ejemplo: 1 caja = 24 piezas
   equivalenceUnit?: string; // La unidad base: 'pieza', 'botella', etc.
+  // Campos que se llenan al recibir la mercancía
+  unitCost?: number;
+  total?: number;
 }
 
 export interface ProductReceipt {

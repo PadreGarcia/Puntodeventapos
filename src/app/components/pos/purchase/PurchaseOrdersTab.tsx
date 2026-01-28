@@ -625,6 +625,11 @@ export function PurchaseOrdersTab({
                       <span className="font-bold text-gray-700">Total de unidades:</span>
                       <span className="font-bold text-2xl text-[#EC0000]">{getTotalItems()}</span>
                     </div>
+                    <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                      <p className="text-xs font-bold text-blue-700 text-center">
+                        💡 Los costos se registrarán al recibir la mercancía
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
