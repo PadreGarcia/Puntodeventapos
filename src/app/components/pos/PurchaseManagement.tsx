@@ -67,7 +67,7 @@ export function PurchaseManagement({ products, onUpdateProducts, suppliers, onUp
   }, []);
 
   const tabs = [
-    { id: 'suppliers' as TabType, label: 'Proveedores', icon: Users, count: suppliers.length },
+    { id: 'suppliers' as TabType, label: 'Proveedores', icon: Users, count: Array.isArray(suppliers) ? suppliers.length : 0 },
     { id: 'orders' as TabType, label: 'Órdenes de Compra', icon: ShoppingCart, count: purchaseOrders.length },
     { id: 'receipts' as TabType, label: 'Recepción', icon: Package, count: receipts.length },
     { id: 'invoices' as TabType, label: 'Facturas', icon: FileText, count: invoices.length },

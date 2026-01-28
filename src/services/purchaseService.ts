@@ -24,27 +24,33 @@ class PurchaseService {
     }
     
     const query = params.toString() ? `?${params.toString()}` : '';
-    return apiClient.get<any[]>(`/purchase-orders${query}`);
+    const response = await apiClient.get<any[]>(`/purchase-orders${query}`);
+    return response.data || [];
   }
 
   async getPurchaseOrderById(id: string) {
-    return apiClient.get<any>(`/purchase-orders/${id}`);
+    const response = await apiClient.get<any>(`/purchase-orders/${id}`);
+    return response.data;
   }
 
   async createPurchaseOrder(order: any) {
-    return apiClient.post<any>('/purchase-orders', order);
+    const response = await apiClient.post<any>('/purchase-orders', order);
+    return response.data;
   }
 
   async updatePurchaseOrder(id: string, order: any) {
-    return apiClient.put<any>(`/purchase-orders/${id}`, order);
+    const response = await apiClient.put<any>(`/purchase-orders/${id}`, order);
+    return response.data;
   }
 
   async updatePurchaseOrderStatus(id: string, status: string) {
-    return apiClient.patch<any>(`/purchase-orders/${id}/status`, { status });
+    const response = await apiClient.patch<any>(`/purchase-orders/${id}/status`, { status });
+    return response.data;
   }
 
   async deletePurchaseOrder(id: string) {
-    return apiClient.delete(`/purchase-orders/${id}`);
+    const response = await apiClient.delete(`/purchase-orders/${id}`);
+    return response.data;
   }
 
   // ==========================================
@@ -65,23 +71,28 @@ class PurchaseService {
     }
     
     const query = params.toString() ? `?${params.toString()}` : '';
-    return apiClient.get<any[]>(`/receipts${query}`);
+    const response = await apiClient.get<any[]>(`/receipts${query}`);
+    return response.data || [];
   }
 
   async getReceiptById(id: string) {
-    return apiClient.get<any>(`/receipts/${id}`);
+    const response = await apiClient.get<any>(`/receipts/${id}`);
+    return response.data;
   }
 
   async createReceipt(receipt: any) {
-    return apiClient.post<any>('/receipts', receipt);
+    const response = await apiClient.post<any>('/receipts', receipt);
+    return response.data;
   }
 
   async updateReceipt(id: string, receipt: any) {
-    return apiClient.put<any>(`/receipts/${id}`, receipt);
+    const response = await apiClient.put<any>(`/receipts/${id}`, receipt);
+    return response.data;
   }
 
   async deleteReceipt(id: string) {
-    return apiClient.delete(`/receipts/${id}`);
+    const response = await apiClient.delete(`/receipts/${id}`);
+    return response.data;
   }
 
   // ==========================================
@@ -102,23 +113,28 @@ class PurchaseService {
     }
     
     const query = params.toString() ? `?${params.toString()}` : '';
-    return apiClient.get<any[]>(`/invoices${query}`);
+    const response = await apiClient.get<any[]>(`/invoices${query}`);
+    return response.data || [];
   }
 
   async getOverdueInvoices() {
-    return apiClient.get<any[]>('/invoices/overdue');
+    const response = await apiClient.get<any[]>('/invoices/overdue');
+    return response.data || [];
   }
 
   async getSupplierInvoiceById(id: string) {
-    return apiClient.get<any>(`/invoices/${id}`);
+    const response = await apiClient.get<any>(`/invoices/${id}`);
+    return response.data;
   }
 
   async createSupplierInvoice(invoice: any) {
-    return apiClient.post<any>('/invoices', invoice);
+    const response = await apiClient.post<any>('/invoices', invoice);
+    return response.data;
   }
 
   async updateSupplierInvoice(id: string, invoice: any) {
-    return apiClient.put<any>(`/invoices/${id}`, invoice);
+    const response = await apiClient.put<any>(`/invoices/${id}`, invoice);
+    return response.data;
   }
 
   async recordInvoicePayment(id: string, payment: {
@@ -127,11 +143,13 @@ class PurchaseService {
     reference?: string;
     notes?: string;
   }) {
-    return apiClient.post<any>(`/invoices/${id}/payment`, payment);
+    const response = await apiClient.post<any>(`/invoices/${id}/payment`, payment);
+    return response.data;
   }
 
   async deleteSupplierInvoice(id: string) {
-    return apiClient.delete(`/invoices/${id}`);
+    const response = await apiClient.delete(`/invoices/${id}`);
+    return response.data;
   }
 
   // ==========================================
@@ -151,15 +169,18 @@ class PurchaseService {
     }
     
     const query = params.toString() ? `?${params.toString()}` : '';
-    return apiClient.get<any[]>(`/payables${query}`);
+    const response = await apiClient.get<any[]>(`/payables${query}`);
+    return response.data || [];
   }
 
   async getPayablesSummary() {
-    return apiClient.get<any>('/payables/summary');
+    const response = await apiClient.get<any>('/payables/summary');
+    return response.data;
   }
 
   async getPayableById(id: string) {
-    return apiClient.get<any>(`/payables/${id}`);
+    const response = await apiClient.get<any>(`/payables/${id}`);
+    return response.data;
   }
 
   async recordPayablePayment(id: string, payment: {
@@ -168,15 +189,18 @@ class PurchaseService {
     reference?: string;
     notes?: string;
   }) {
-    return apiClient.post<any>(`/payables/${id}/payment`, payment);
+    const response = await apiClient.post<any>(`/payables/${id}/payment`, payment);
+    return response.data;
   }
 
   async updatePayable(id: string, payable: any) {
-    return apiClient.put<any>(`/payables/${id}`, payable);
+    const response = await apiClient.put<any>(`/payables/${id}`, payable);
+    return response.data;
   }
 
   async deletePayable(id: string) {
-    return apiClient.delete(`/payables/${id}`);
+    const response = await apiClient.delete(`/payables/${id}`);
+    return response.data;
   }
 
   // ==========================================
@@ -184,23 +208,28 @@ class PurchaseService {
   // ==========================================
 
   async getSuppliers() {
-    return apiClient.get<any[]>('/suppliers');
+    const response = await apiClient.get<any[]>('/suppliers');
+    return response.data || [];
   }
 
   async getSupplierById(id: string) {
-    return apiClient.get<any>(`/suppliers/${id}`);
+    const response = await apiClient.get<any>(`/suppliers/${id}`);
+    return response.data;
   }
 
   async createSupplier(supplier: any) {
-    return apiClient.post<any>('/suppliers', supplier);
+    const response = await apiClient.post<any>('/suppliers', supplier);
+    return response.data;
   }
 
   async updateSupplier(id: string, supplier: any) {
-    return apiClient.put<any>(`/suppliers/${id}`, supplier);
+    const response = await apiClient.put<any>(`/suppliers/${id}`, supplier);
+    return response.data;
   }
 
   async deleteSupplier(id: string) {
-    return apiClient.delete(`/suppliers/${id}`);
+    const response = await apiClient.delete(`/suppliers/${id}`);
+    return response.data;
   }
 }
 

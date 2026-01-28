@@ -28,7 +28,10 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
     status: 'active',
   });
 
-  const filteredSuppliers = suppliers.filter(supplier =>
+  // Asegurar que suppliers siempre sea un array
+  const safeSuppliers = Array.isArray(suppliers) ? suppliers : [];
+
+  const filteredSuppliers = safeSuppliers.filter(supplier =>
     supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.contactName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.taxId.toLowerCase().includes(searchTerm.toLowerCase())
@@ -94,7 +97,7 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
         
         await purchaseService.updateSupplier(editingSupplier.id, updatedSupplier);
         
-        const updated = suppliers.map(s => 
+        const updated = safeSuppliers.map(s => 
           s.id === editingSupplier.id ? updatedSupplier : s
         );
         onUpdateSuppliers(updated);
@@ -109,7 +112,7 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
         
         const savedSupplier = await purchaseService.createSupplier(newSupplier);
         
-        onUpdateSuppliers([...suppliers, savedSupplier]);
+        onUpdateSuppliers([...safeSuppliers, savedSupplier]);
         toast.success('Proveedor creado correctamente');
       }
 
@@ -125,7 +128,7 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
       try {
         await purchaseService.deleteSupplier(supplier.id);
         
-        onUpdateSuppliers(suppliers.filter(s => s.id !== supplier.id));
+        onUpdateSuppliers(safeSuppliers.filter(s => s.id !== supplier.id));
         
         // Remover la asociación de productos
         const updatedProducts = products.map(p => 
