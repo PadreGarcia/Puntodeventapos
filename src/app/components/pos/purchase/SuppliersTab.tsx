@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Plus, Edit2, Trash2, X, Save, Building2, Mail, Phone, MapPin, FileText, AlertCircle, Calendar } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, X, Save, Building2, Mail, Phone, MapPin, FileText, AlertCircle, Calendar, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import { purchaseService } from '@/services';
 import type { Supplier, Product } from '@/types/pos';
@@ -232,43 +232,80 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
                 <div className="p-5">
                   {/* Info de contacto */}
                   <div className="space-y-3 mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0 w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
+                    {/* Email - Línea completa */}
+                    <div className="flex items-center gap-3 bg-blue-50/50 rounded-xl p-3 border border-blue-100">
+                      <div className="flex-shrink-0 w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center">
                         <Mail className="w-4 h-4 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-500 font-medium mb-0.5">Email</p>
+                        <p className="text-xs text-blue-600 font-bold uppercase mb-0.5">Email</p>
                         <p className="text-sm text-gray-900 font-medium truncate">{supplier.email}</p>
                       </div>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(supplier.email);
+                          toast.success('📧 Email copiado al portapapeles');
+                        }}
+                        className="flex-shrink-0 p-2 hover:bg-blue-200 rounded-lg text-blue-600 transition-all active:scale-95"
+                        title="Copiar email"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0 w-9 h-9 bg-green-50 rounded-lg flex items-center justify-center">
-                        <Phone className="w-4 h-4 text-green-600" />
+                    {/* Teléfono y RFC - Dos columnas */}
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Teléfono */}
+                      <div className="flex items-center gap-2 bg-green-50/50 rounded-xl p-3 border border-green-100">
+                        <div className="flex-shrink-0 w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
+                          <Phone className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-green-600 font-bold uppercase mb-0.5">Teléfono</p>
+                          <p className="text-sm text-gray-900 font-bold truncate">{supplier.phone}</p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(supplier.phone);
+                            toast.success('📞 Teléfono copiado al portapapeles');
+                          }}
+                          className="flex-shrink-0 p-1.5 hover:bg-green-200 rounded-lg text-green-600 transition-all active:scale-95"
+                          title="Copiar teléfono"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-500 font-medium mb-0.5">Teléfono</p>
-                        <p className="text-sm text-gray-900 font-bold">{supplier.phone}</p>
+
+                      {/* RFC */}
+                      <div className="flex items-center gap-2 bg-orange-50/50 rounded-xl p-3 border border-orange-100">
+                        <div className="flex-shrink-0 w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center">
+                          <FileText className="w-4 h-4 text-orange-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-orange-600 font-bold uppercase mb-0.5">RFC</p>
+                          <p className="text-sm text-gray-900 font-mono font-bold truncate">{supplier.taxId}</p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(supplier.taxId);
+                            toast.success('📄 RFC copiado al portapapeles');
+                          }}
+                          className="flex-shrink-0 p-1.5 hover:bg-orange-200 rounded-lg text-orange-600 transition-all active:scale-95"
+                          title="Copiar RFC"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center mt-0.5">
+                    {/* Dirección - Línea completa */}
+                    <div className="flex items-start gap-3 bg-purple-50/50 rounded-xl p-3 border border-purple-100">
+                      <div className="flex-shrink-0 w-9 h-9 bg-purple-100 rounded-lg flex items-center justify-center mt-0.5">
                         <MapPin className="w-4 h-4 text-purple-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-500 font-medium mb-0.5">Dirección</p>
+                        <p className="text-xs text-purple-600 font-bold uppercase mb-0.5">Dirección</p>
                         <p className="text-sm text-gray-900 line-clamp-2 leading-relaxed">{supplier.address}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0 w-9 h-9 bg-orange-50 rounded-lg flex items-center justify-center">
-                        <FileText className="w-4 h-4 text-orange-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-500 font-medium mb-0.5">RFC</p>
-                        <p className="text-sm text-gray-900 font-mono font-bold">{supplier.taxId}</p>
                       </div>
                     </div>
                   </div>
