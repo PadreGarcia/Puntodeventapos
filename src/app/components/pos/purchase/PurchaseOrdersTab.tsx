@@ -736,30 +736,20 @@ export function PurchaseOrdersTab({
               {/* PASO 3: Revisión Final */}
               {currentStep === 3 && (
                 <div className="space-y-6">
-                  {/* Información del proveedor */}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-blue-500 p-3 rounded-xl">
-                        <Package className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-xs font-bold text-blue-700 uppercase mb-1">Proveedor</p>
-                        <h4 className="font-bold text-gray-900 text-lg">
-                          {suppliers.find(s => s.id === selectedSupplier)?.name}
-                        </h4>
-                      </div>
-                    </div>
+                  {/* Nombre del proveedor como título */}
+                  <div>
+                    <h3 className="font-bold text-gray-900 text-2xl mb-1">
+                      {suppliers.find(s => s.id === selectedSupplier)?.name}
+                    </h3>
                     {notes && (
-                      <div className="mt-3 p-3 bg-white rounded-lg">
-                        <p className="text-xs font-bold text-gray-600 mb-1">NOTAS:</p>
-                        <p className="text-sm text-gray-800">{notes}</p>
-                      </div>
+                      <p className="text-sm text-gray-600 mt-2 italic">
+                        Nota: {notes}
+                      </p>
                     )}
                   </div>
 
                   {/* Tabla de productos */}
                   <div>
-                    <h4 className="font-bold text-gray-900 mb-3 text-lg">Productos a Ordenar</h4>
                     <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
                       <div className="overflow-x-auto">
                         <table className="w-full">
@@ -795,23 +785,10 @@ export function PurchaseOrdersTab({
                       </div>
                     </div>
 
-                    {/* Resumen final */}
-                    <div className="mt-4 grid grid-cols-2 gap-4">
-                      <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border-2 border-purple-200">
-                        <p className="text-xs font-bold text-purple-700 uppercase mb-1">Total de productos</p>
-                        <p className="text-3xl font-bold text-purple-900">{orderItems.length}</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border-2 border-green-200">
-                        <p className="text-xs font-bold text-green-700 uppercase mb-1">Total de unidades</p>
-                        <p className="text-3xl font-bold text-green-900">{getTotalItems()}</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200">
-                      <p className="text-sm font-bold text-blue-800 text-center">
-                        💡 Los costos se registrarán al recibir la mercancía
-                      </p>
-                    </div>
+                    {/* Mensaje de costos */}
+                    <p className="text-sm text-gray-600 text-center mt-4 italic">
+                      Los costos se registrarán al recibir la mercancía
+                    </p>
                   </div>
                 </div>
               )}
