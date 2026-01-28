@@ -112,7 +112,9 @@ export function ReceiptsTab({
 
     // Obtener información del usuario actual
     const currentUser = apiClient.getStoredUser();
-    const receivedByName = currentUser?.name || currentUser?.username || 'Usuario';
+    
+    // El backend devuelve el campo 'fullName'
+    const receivedByName = currentUser?.fullName || currentUser?.username || 'Usuario';
 
     // Crear el recibo con los nombres de campos correctos para el backend
     const newReceipt = {
