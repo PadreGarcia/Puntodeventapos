@@ -26,6 +26,6 @@ router.post('/', createReceipt);
 router.put('/:id', updateReceipt);
 
 // DELETE /api/receipts/:id - Eliminar recepción (admin, supervisor)
-router.delete('/:id', authorize(['admin', 'supervisor']), deleteReceipt);
+router.delete('/:id', authorize('admin', 'supervisor'), deleteReceipt);
 
 export default router;

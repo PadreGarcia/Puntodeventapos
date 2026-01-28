@@ -30,12 +30,6 @@ export const protect = async (req, res, next) => {
       });
     }
 
-    console.log('✅ Usuario autenticado:', {
-      username: user.username,
-      role: user.role,
-      fullName: user.fullName
-    });
-
     // Agregar usuario a la request
     req.userId = user._id;
     req.user = user;
@@ -56,11 +50,6 @@ export const verifyToken = protect;
 // Middleware para verificar roles
 export const authorize = (...roles) => {
   return (req, res, next) => {
-    console.log('🔒 Verificando autorización:');
-    console.log('  - Roles permitidos:', roles);
-    console.log('  - Usuario:', req.user?.username);
-    console.log('  - Rol del usuario:', req.user?.role);
-    
     if (!req.user) {
       return res.status(403).json({
         success: false,

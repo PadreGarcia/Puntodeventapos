@@ -30,6 +30,6 @@ router.post('/:id/payment', recordPayment);
 router.put('/:id', updatePayable);
 
 // DELETE /api/payables/:id - Eliminar cuenta (admin, supervisor)
-router.delete('/:id', authorize(['admin', 'supervisor']), deletePayable);
+router.delete('/:id', authorize('admin', 'supervisor'), deletePayable);
 
 export default router;

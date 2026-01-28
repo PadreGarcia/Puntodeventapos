@@ -153,10 +153,6 @@ export function PurchaseOrdersTab({
 
   const handleSendOrder = async (order: PurchaseOrder) => {
     try {
-      console.log('📤 Intentando enviar orden:', order.orderNumber);
-      console.log('🔑 Token existe:', !!localStorage.getItem('token'));
-      console.log('👤 Usuario guardado:', localStorage.getItem('user'));
-      
       await purchaseService.updatePurchaseOrderStatus(order.id, 'sent');
       
       const updated = purchaseOrders.map(o =>

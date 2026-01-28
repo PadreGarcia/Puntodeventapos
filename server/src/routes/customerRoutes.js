@@ -48,7 +48,7 @@ router.post('/', createCustomer);
 router.put('/:id', updateCustomer);
 
 // DELETE /api/customers/:id - Eliminar cliente
-router.delete('/:id', authorize(['admin']), deleteCustomer);
+router.delete('/:id', authorize('admin'), deleteCustomer);
 
 // ==================== LEALTAD ====================
 
@@ -61,6 +61,6 @@ router.post('/:id/loyalty/redeem', redeemLoyaltyPoints);
 // ==================== CRÉDITO ====================
 
 // PATCH /api/customers/:id/credit - Actualizar límite de crédito
-router.patch('/:id/credit', authorize(['admin', 'supervisor']), updateCreditLimit);
+router.patch('/:id/credit', authorize('admin', 'supervisor'), updateCreditLimit);
 
 export default router;

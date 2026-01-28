@@ -35,7 +35,7 @@ router.get('/customer/:customerId/history', getCustomerPaymentHistory);
 router.get('/:id', getAccountReceivableById);
 
 // POST /api/receivables - Crear cuenta por cobrar (fiado)
-router.post('/', authorize(['admin', 'supervisor']), createAccountReceivable);
+router.post('/', authorize('admin', 'supervisor'), createAccountReceivable);
 
 // ==================== PAGOS ====================
 
@@ -43,11 +43,11 @@ router.post('/', authorize(['admin', 'supervisor']), createAccountReceivable);
 router.post('/:id/payment', recordPayment);
 
 // PATCH /api/receivables/:id/interest - Actualizar tasa de interés
-router.patch('/:id/interest', authorize(['admin', 'supervisor']), updateInterestRate);
+router.patch('/:id/interest', authorize('admin', 'supervisor'), updateInterestRate);
 
 // ==================== CANCELACIÓN ====================
 
 // POST /api/receivables/:id/cancel - Cancelar cuenta
-router.post('/:id/cancel', authorize(['admin']), cancelAccountReceivable);
+router.post('/:id/cancel', authorize('admin'), cancelAccountReceivable);
 
 export default router;

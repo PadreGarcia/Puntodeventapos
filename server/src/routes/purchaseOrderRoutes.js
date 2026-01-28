@@ -27,9 +27,9 @@ router.post('/', createPurchaseOrder);
 router.put('/:id', updatePurchaseOrder);
 
 // PATCH /api/purchase-orders/:id/status - Cambiar status (admin, supervisor)
-router.patch('/:id/status', authorize(['admin', 'supervisor']), updateOrderStatus);
+router.patch('/:id/status', authorize('admin', 'supervisor'), updateOrderStatus);
 
 // DELETE /api/purchase-orders/:id - Eliminar orden (admin, supervisor)
-router.delete('/:id', authorize(['admin', 'supervisor']), deletePurchaseOrder);
+router.delete('/:id', authorize('admin', 'supervisor'), deletePurchaseOrder);
 
 export default router;

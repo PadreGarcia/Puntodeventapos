@@ -35,29 +35,29 @@ router.get('/card/:cardId', getNFCCardByCardId);
 router.get('/:id', getNFCCardById);
 
 // POST /api/nfc - Crear tarjeta
-router.post('/', authorize(['admin', 'supervisor']), createNFCCard);
+router.post('/', authorize('admin', 'supervisor'), createNFCCard);
 
 // PUT /api/nfc/:id - Actualizar tarjeta
-router.put('/:id', authorize(['admin', 'supervisor']), updateNFCCard);
+router.put('/:id', authorize('admin', 'supervisor'), updateNFCCard);
 
 // DELETE /api/nfc/:id - Eliminar tarjeta
-router.delete('/:id', authorize(['admin']), deleteNFCCard);
+router.delete('/:id', authorize('admin'), deleteNFCCard);
 
 // ==================== VINCULACIÓN ====================
 
 // POST /api/nfc/:id/link - Vincular con cliente
-router.post('/:id/link', authorize(['admin', 'supervisor']), linkNFCCard);
+router.post('/:id/link', authorize('admin', 'supervisor'), linkNFCCard);
 
 // POST /api/nfc/:id/unlink - Desvincular
-router.post('/:id/unlink', authorize(['admin', 'supervisor']), unlinkNFCCard);
+router.post('/:id/unlink', authorize('admin', 'supervisor'), unlinkNFCCard);
 
 // ==================== ACTIVACIÓN/BLOQUEO ====================
 
 // POST /api/nfc/:id/activate - Activar tarjeta
-router.post('/:id/activate', authorize(['admin', 'supervisor']), activateNFCCard);
+router.post('/:id/activate', authorize('admin', 'supervisor'), activateNFCCard);
 
 // POST /api/nfc/:id/block - Bloquear tarjeta
-router.post('/:id/block', authorize(['admin', 'supervisor']), blockNFCCard);
+router.post('/:id/block', authorize('admin', 'supervisor'), blockNFCCard);
 
 // ==================== USO ====================
 

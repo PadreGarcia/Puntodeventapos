@@ -34,6 +34,6 @@ router.put('/:id', updateInvoice);
 router.post('/:id/payment', recordPayment);
 
 // DELETE /api/invoices/:id - Eliminar factura (admin, supervisor)
-router.delete('/:id', authorize(['admin', 'supervisor']), deleteInvoice);
+router.delete('/:id', authorize('admin', 'supervisor'), deleteInvoice);
 
 export default router;

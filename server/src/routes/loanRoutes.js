@@ -44,10 +44,10 @@ router.get('/', getLoans);
 router.get('/:id', getLoanById);
 
 // POST /api/loans - Crear préstamo
-router.post('/', authorize(['admin', 'supervisor']), createLoan);
+router.post('/', authorize('admin', 'supervisor'), createLoan);
 
 // PUT /api/loans/:id - Actualizar préstamo
-router.put('/:id', authorize(['admin', 'supervisor']), updateLoan);
+router.put('/:id', authorize('admin', 'supervisor'), updateLoan);
 
 // ==================== RUTAS CON :id ESPECÍFICAS ====================
 
@@ -60,7 +60,7 @@ router.get('/:id/schedule', getAmortizationSchedule);
 // ==================== DESEMBOLSO ====================
 
 // POST /api/loans/:id/disburse - Desembolsar préstamo
-router.post('/:id/disburse', authorize(['admin', 'supervisor']), disburseLoan);
+router.post('/:id/disburse', authorize('admin', 'supervisor'), disburseLoan);
 
 // ==================== PAGOS ====================
 
@@ -70,6 +70,6 @@ router.post('/:id/payment', recordLoanPayment);
 // ==================== CANCELACIÓN ====================
 
 // POST /api/loans/:id/cancel - Cancelar préstamo
-router.post('/:id/cancel', authorize(['admin']), cancelLoan);
+router.post('/:id/cancel', authorize('admin'), cancelLoan);
 
 export default router;

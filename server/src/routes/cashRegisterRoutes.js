@@ -36,7 +36,7 @@ router.post('/close', closeCashRegister);
 router.get('/movements', getCashMovements);
 
 // POST /api/cash/movements - Registrar retiro/ingreso
-router.post('/movements', authorize(['admin', 'supervisor', 'cashier']), addCashMovement);
+router.post('/movements', authorize('admin', 'supervisor', 'cashier'), addCashMovement);
 
 // ==================== ARQUEOS ====================
 
