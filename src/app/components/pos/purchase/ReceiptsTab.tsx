@@ -421,48 +421,50 @@ export function ReceiptsTab({
             </div>
 
             <div className="p-3 sm:p-6 space-y-3 sm:space-y-4 max-h-[calc(100vh-140px)] sm:max-h-[calc(90vh-100px)] overflow-y-auto">
-              {/* Tabla tipo ticket - Desktop */}
-              <div className="hidden sm:block bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
+              {/* Lista ultra-compacta tipo ticket real */}
+              <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
                 {/* Header de la tabla */}
-                <div className="bg-gray-50 border-b-2 border-gray-200">
-                  <div className="grid grid-cols-12 gap-2 px-4 py-3 font-bold text-sm text-gray-700">
-                    <div className="col-span-6">Producto</div>
-                    <div className="col-span-2 text-center">Ordenado</div>
-                    <div className="col-span-4 text-center">Recibido</div>
+                <div className="bg-gray-50 border-b-2 border-gray-200 px-2 sm:px-4 py-2 sm:py-3 sticky top-0 z-10">
+                  <div className="flex items-center gap-1 sm:gap-2 font-bold text-[10px] sm:text-xs text-gray-600 uppercase">
+                    <div className="flex-1 min-w-0">Producto</div>
+                    <div className="w-8 sm:w-10 text-center shrink-0">Ord.</div>
+                    <div className="w-28 sm:w-32 text-center shrink-0">Recibido</div>
                   </div>
                 </div>
 
-                {/* Items */}
-                <div className="divide-y divide-gray-200">
+                {/* Items - Lista compacta */}
+                <div className="divide-y divide-gray-100">
                   {receivedItems.map(item => (
                     <div
                       key={item.productId}
-                      className="grid grid-cols-12 gap-2 px-4 py-3 items-center hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-50 active:bg-gray-50 transition-colors"
                     >
-                      {/* Nombre del producto */}
-                      <div className="col-span-6">
-                        <div className="font-bold text-gray-900 text-sm">{item.productName}</div>
+                      {/* Nombre del producto - truncado */}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-gray-900 text-xs sm:text-sm truncate" title={item.productName}>
+                          {item.productName}
+                        </div>
                       </div>
 
                       {/* Cantidad ordenada */}
-                      <div className="col-span-2 text-center">
-                        <span className="text-sm font-bold text-gray-600">{item.orderedQuantity}</span>
+                      <div className="w-8 sm:w-10 text-center shrink-0">
+                        <span className="text-xs sm:text-sm font-bold text-gray-600">{item.orderedQuantity}</span>
                       </div>
 
-                      {/* Cantidad recibida con botones +/- */}
-                      <div className="col-span-4 flex items-center justify-center gap-2">
+                      {/* Cantidad recibida con botones +/- ultra compactos */}
+                      <div className="w-28 sm:w-32 flex items-center justify-center gap-1 shrink-0">
                         <button
                           onClick={() => handleUpdateReceivedQuantity(item.productId, Math.max(0, item.receivedQuantity - 1))}
-                          className="w-8 h-8 flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-bold transition-all active:scale-95"
+                          className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-red-100 active:bg-red-200 text-red-700 rounded font-bold text-sm sm:text-base transition-all active:scale-95"
                         >
                           -
                         </button>
-                        <div className="w-16 px-2 py-1.5 bg-gray-50 border-2 border-gray-200 rounded-lg text-center font-bold text-gray-900">
+                        <div className="w-10 sm:w-12 h-7 sm:h-8 px-1 bg-gray-50 border-2 border-gray-200 rounded flex items-center justify-center font-bold text-xs sm:text-sm text-gray-900">
                           {item.receivedQuantity}
                         </div>
                         <button
                           onClick={() => handleUpdateReceivedQuantity(item.productId, item.receivedQuantity + 1)}
-                          className="w-8 h-8 flex items-center justify-center bg-green-100 hover:bg-green-200 text-green-700 rounded-lg font-bold transition-all active:scale-95"
+                          className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-green-100 active:bg-green-200 text-green-700 rounded font-bold text-sm sm:text-base transition-all active:scale-95"
                         >
                           +
                         </button>
@@ -470,48 +472,6 @@ export function ReceiptsTab({
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Cards tipo ticket - Mobile */}
-              <div className="sm:hidden space-y-2">
-                {receivedItems.map(item => (
-                  <div
-                    key={item.productId}
-                    className="bg-white rounded-xl border-2 border-gray-200 p-3 active:bg-gray-50 transition-colors"
-                  >
-                    {/* Nombre y cantidad ordenada */}
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1 pr-2">
-                        <h4 className="font-bold text-gray-900 text-sm leading-tight">{item.productName}</h4>
-                        <p className="text-xs text-gray-600 mt-1">
-                          Ordenado: <span className="font-bold text-gray-900">{item.orderedQuantity}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Controles de cantidad - Mobile */}
-                    <div className="flex items-center justify-between gap-2 bg-gray-50 rounded-lg p-2">
-                      <span className="text-xs font-bold text-gray-600">Recibido:</span>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleUpdateReceivedQuantity(item.productId, Math.max(0, item.receivedQuantity - 1))}
-                          className="w-10 h-10 flex items-center justify-center bg-red-100 active:bg-red-200 text-red-700 rounded-lg font-bold text-xl transition-all active:scale-95"
-                        >
-                          -
-                        </button>
-                        <div className="w-16 h-10 px-3 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center font-bold text-lg text-gray-900">
-                          {item.receivedQuantity}
-                        </div>
-                        <button
-                          onClick={() => handleUpdateReceivedQuantity(item.productId, item.receivedQuantity + 1)}
-                          className="w-10 h-10 flex items-center justify-center bg-green-100 active:bg-green-200 text-green-700 rounded-lg font-bold text-xl transition-all active:scale-95"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
               </div>
 
               {/* Botones */}
