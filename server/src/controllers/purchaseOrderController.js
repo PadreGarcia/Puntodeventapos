@@ -64,24 +64,24 @@ export const createPurchaseOrder = async (req, res) => {
     const orderData = {
       ...req.body,
       orderNumber,
-      createdBy: req.userId,
-      createdByName: req.user.fullName
+      createdBy: req.userId || 'system',
+      createdByName: req.user?.fullName || req.user?.username || 'Usuario'
     };
     
     const order = await PurchaseOrder.create(orderData);
 
     // Auditoría
     await AuditLog.create({
-      userId: req.userId,
-      userName: req.user.fullName,
-      userRole: req.user.role,
+      userId: req.userId || 'system',
+      userName: req.user?.fullName || req.user?.username || 'Usuario',
+      userRole: req.user?.role || 'user',
       action: 'purchase_order_created',
       module: 'purchases',
       description: `Orden de compra creada: ${order.orderNumber} - ${order.supplierName}`,
       details: { 
         orderId: order._id,
         orderNumber: order.orderNumber,
-        total: order.total
+        total: order.total || 0
       },
       ipAddress: req.ip,
       success: true
@@ -119,9 +119,9 @@ export const updatePurchaseOrder = async (req, res) => {
 
     // Auditoría
     await AuditLog.create({
-      userId: req.userId,
-      userName: req.user.fullName,
-      userRole: req.user.role,
+      userId: req.userId || 'system',
+      userName: req.user?.fullName || req.user?.username || 'Usuario',
+      userRole: req.user?.role || 'user',
       action: 'purchase_order_updated',
       module: 'purchases',
       description: `Orden de compra actualizada: ${order.orderNumber}`,
@@ -176,9 +176,9 @@ export const updateOrderStatus = async (req, res) => {
 
     // Auditoría
     await AuditLog.create({
-      userId: req.userId,
-      userName: req.user.fullName,
-      userRole: req.user.role,
+      userId: req.userId || 'system',
+      userName: req.user?.fullName || req.user?.username || 'Usuario',
+      userRole: req.user?.role || 'user',
       action: 'purchase_order_status_changed',
       module: 'purchases',
       description: `Status de orden ${order.orderNumber} cambió de ${previousStatus} a ${status}`,
@@ -229,9 +229,9 @@ export const deletePurchaseOrder = async (req, res) => {
 
     // Auditoría
     await AuditLog.create({
-      userId: req.userId,
-      userName: req.user.fullName,
-      userRole: req.user.role,
+      userId: req.userId || 'system',
+      userName: req.user?.fullName || req.user?.username || 'Usuario',
+      userRole: req.user?.role || 'user',
       action: 'purchase_order_deleted',
       module: 'purchases',
       description: `Orden de compra eliminada: ${order.orderNumber}`,

@@ -211,12 +211,15 @@ export function PurchaseOrdersTab({
     }).format(amount);
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string | undefined) => {
+    if (!date) return 'Sin fecha';
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(dateObj.getTime())) return 'Fecha inválida';
     return new Intl.DateTimeFormat('es-MX', {
       day: '2-digit',
       month: 'short',
       year: 'numeric'
-    }).format(date);
+    }).format(dateObj);
   };
 
   const lowStockProducts = getLowStockProducts();
