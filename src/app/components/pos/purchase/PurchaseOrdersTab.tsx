@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Plus, X, Save, AlertTriangle, CheckCircle, Package, Clock, Eye, Send, XCircle, FileText } from 'lucide-react';
+import { Search, Plus, X, Save, AlertTriangle, CheckCircle, Package, Clock, Eye, Send, XCircle, FileText, ChevronRight, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { purchaseService } from '@/services';
 import type { PurchaseOrder, PurchaseOrderItem, Supplier, Product, PurchaseOrderStatus } from '@/types/pos';
@@ -25,6 +25,7 @@ export function PurchaseOrdersTab({
   const [selectedSupplier, setSelectedSupplier] = useState('');
   const [orderItems, setOrderItems] = useState<PurchaseOrderItem[]>([]);
   const [notes, setNotes] = useState('');
+  const [currentStep, setCurrentStep] = useState(1);
 
   const filteredOrders = purchaseOrders.filter(order => {
     const matchesSearch = order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -46,11 +47,25 @@ export function PurchaseOrdersTab({
     setSelectedSupplier('');
     setOrderItems([]);
     setNotes('');
+    setCurrentStep(1);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setViewOrder(null);
+    setCurrentStep(1);
+  };
+
+  const handleNextStep = () => {
+    if (!selectedSupplier) {
+      toast.error('Selecciona un proveedor');
+      return;
+    }
+    setCurrentStep(2);
+  };
+
+  const handlePreviousStep = () => {
+    setCurrentStep(1);
   };
 
   const handleViewOrder = (order: PurchaseOrder) => {
@@ -460,195 +475,279 @@ export function PurchaseOrdersTab({
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl my-8">
-            <div className="bg-gradient-to-r from-[#EC0000] to-[#D50000] text-white p-6 flex items-center justify-between rounded-t-2xl sticky top-0 z-10">
-              <h3 className="text-2xl font-bold">Nueva Orden de Compra</h3>
-              <button
-                onClick={handleCloseModal}
-                className="p-2.5 hover:bg-white/15 rounded-xl transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-6 max-h-[calc(90vh-100px)] overflow-y-auto">
-              {/* Seleccionar proveedor */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Proveedor *</label>
-                <select
-                  value={selectedSupplier}
-                  onChange={(e) => setSelectedSupplier(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none font-medium"
-                >
-                  <option value="">Selecciona un proveedor</option>
-                  {suppliers.filter(s => s.status === 'active').map(supplier => (
-                    <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Productos */}
-              {selectedSupplier && (
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Agregar Productos</label>
-                  <select
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        handleAddProduct(e.target.value);
-                        e.target.value = '';
-                      }
-                    }}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none font-medium"
-                  >
-                    <option value="">Selecciona un producto</option>
-                    {supplierProducts.map(product => (
-                      <option key={product.id} value={product.id}>
-                        {product.name} - Stock: {product.stock}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {/* Items de la orden */}
-              {orderItems.length > 0 && (
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h4 className="font-bold text-gray-900 mb-3">Productos en la Orden</h4>
-                  <div className="space-y-3">
-                    {orderItems.map(item => (
-                      <div key={item.productId} className="bg-white rounded-lg p-4 space-y-3">
-                        {/* Nombre del producto */}
-                        <div className="flex items-center justify-between">
-                          <div className="font-bold text-gray-900 text-lg">{item.productName}</div>
-                          <button
-                            onClick={() => handleRemoveItem(item.productId)}
-                            className="p-2 hover:bg-red-100 rounded-lg text-red-600 transition-colors"
-                          >
-                            <X className="w-5 h-5" />
-                          </button>
-                        </div>
-
-                        {/* Cantidad y Unidad */}
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-xs font-bold text-gray-600 mb-1">Cantidad</label>
-                            <input
-                              type="number"
-                              min="1"
-                              value={item.quantity}
-                              onChange={(e) => handleUpdateQuantity(item.productId, parseInt(e.target.value) || 1)}
-                              className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none text-center font-bold text-lg"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-gray-600 mb-1">Unidad</label>
-                            <select
-                              value={item.unit}
-                              onChange={(e) => handleUpdateUnit(item.productId, e.target.value)}
-                              className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none font-bold"
-                            >
-                              <option value="pieza">Pieza(s)</option>
-                              <option value="caja">Caja(s)</option>
-                              <option value="paquete">Paquete(s)</option>
-                              <option value="botella">Botella(s)</option>
-                              <option value="litro">Litro(s)</option>
-                              <option value="kilogramo">Kilogramo(s)</option>
-                              <option value="costal">Costal(es)</option>
-                              <option value="garrafon">Garrafón(es)</option>
-                              <option value="display">Display(s)</option>
-                            </select>
-                          </div>
-                        </div>
-
-                        {/* Equivalencia opcional */}
-                        <div className="bg-blue-50 rounded-lg p-3">
-                          <label className="block text-xs font-bold text-blue-700 mb-2">
-                            Equivalencia (Opcional)
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold text-blue-900">1 {item.unit} =</span>
-                            <input
-                              type="number"
-                              min="1"
-                              placeholder="24"
-                              value={item.unitEquivalence || ''}
-                              onChange={(e) => handleUpdateEquivalence(
-                                item.productId, 
-                                parseInt(e.target.value) || 0,
-                                item.equivalenceUnit || 'pieza'
-                              )}
-                              className="w-20 px-3 py-2 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-center font-bold"
-                            />
-                            <select
-                              value={item.equivalenceUnit || 'pieza'}
-                              onChange={(e) => handleUpdateEquivalence(
-                                item.productId,
-                                item.unitEquivalence || 0,
-                                e.target.value
-                              )}
-                              className="flex-1 px-3 py-2 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-bold text-sm"
-                            >
-                              <option value="pieza">pieza(s)</option>
-                              <option value="botella">botella(s)</option>
-                              <option value="unidad">unidad(es)</option>
-                              <option value="lata">lata(s)</option>
-                            </select>
-                          </div>
-                          {item.unitEquivalence && item.unitEquivalence > 0 && (
-                            <div className="mt-2 text-xs font-bold text-blue-600">
-                              Total: {item.quantity} {item.unit}(s) = {item.quantity * item.unitEquivalence} {item.equivalenceUnit}(s)
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Resumen */}
-                  <div className="mt-4 pt-4 border-t-2 border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-gray-700">Total de productos:</span>
-                      <span className="font-bold text-2xl text-[#EC0000]">{orderItems.length}</span>
-                    </div>
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="font-bold text-gray-700">Total de unidades:</span>
-                      <span className="font-bold text-2xl text-[#EC0000]">{getTotalItems()}</span>
-                    </div>
-                    <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                      <p className="text-xs font-bold text-blue-700 text-center">
-                        💡 Los costos se registrarán al recibir la mercancía
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Notas */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Notas</label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none font-medium resize-none"
-                  placeholder="Notas adicionales sobre la orden..."
-                />
-              </div>
-
-              {/* Botones */}
-              <div className="flex gap-3 pt-4">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[#EC0000] to-[#D50000] text-white p-6 rounded-t-2xl sticky top-0 z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-2xl font-bold">Nueva Orden de Compra</h3>
                 <button
                   onClick={handleCloseModal}
-                  className="flex-1 px-6 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-colors"
+                  className="p-2.5 hover:bg-white/15 rounded-xl transition-colors"
                 >
-                  Cancelar
+                  <X className="w-6 h-6" />
                 </button>
-                <button
-                  onClick={handleCreateOrder}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-[#EC0000] to-[#D50000] hover:from-[#D50000] hover:to-[#C00000] text-white rounded-xl font-bold shadow-lg shadow-red-500/30 transition-all active:scale-95"
-                >
-                  <Save className="w-5 h-5" />
-                  Crear Orden
-                </button>
+              </div>
+
+              {/* Indicador de pasos */}
+              <div className="flex items-center gap-2">
+                <div className={`flex-1 h-2 rounded-full transition-all ${currentStep >= 1 ? 'bg-white' : 'bg-white/30'}`}></div>
+                <div className={`flex-1 h-2 rounded-full transition-all ${currentStep >= 2 ? 'bg-white' : 'bg-white/30'}`}></div>
+              </div>
+              <div className="flex justify-between mt-2">
+                <span className={`text-sm font-bold ${currentStep === 1 ? 'text-white' : 'text-white/60'}`}>
+                  1. Proveedor
+                </span>
+                <span className={`text-sm font-bold ${currentStep === 2 ? 'text-white' : 'text-white/60'}`}>
+                  2. Productos
+                </span>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6 max-h-[calc(90vh-200px)] overflow-y-auto">
+              {/* PASO 1: Proveedor y Notas */}
+              {currentStep === 1 && (
+                <div className="space-y-6">
+                  {/* Seleccionar proveedor */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      Proveedor *
+                    </label>
+                    <select
+                      value={selectedSupplier}
+                      onChange={(e) => setSelectedSupplier(e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none font-medium"
+                    >
+                      <option value="">Selecciona un proveedor</option>
+                      {suppliers.filter(s => s.status === 'active').map(supplier => (
+                        <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Información del proveedor seleccionado */}
+                  {selectedSupplier && (() => {
+                    const supplier = suppliers.find(s => s.id === selectedSupplier);
+                    return supplier ? (
+                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200">
+                        <div className="flex items-start gap-3">
+                          <div className="bg-blue-500 p-3 rounded-xl">
+                            <Package className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-bold text-gray-900 mb-1">{supplier.name}</h4>
+                            <p className="text-sm text-gray-600 mb-2">{supplier.email}</p>
+                            <p className="text-sm text-gray-600">{supplier.phone}</p>
+                            <div className="mt-3 p-2 bg-white rounded-lg">
+                              <p className="text-xs font-bold text-blue-700">
+                                📦 Productos disponibles: {supplierProducts.length}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null;
+                  })()}
+
+                  {/* Notas */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      Notas <span className="text-gray-400 font-normal">(Opcional)</span>
+                    </label>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      rows={4}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none font-medium resize-none"
+                      placeholder="Ej: Solicitar entrega antes del viernes, incluir producto extra..."
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* PASO 2: Productos */}
+              {currentStep === 2 && (
+                <div className="space-y-6">
+                  {/* Agregar productos */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Agregar Productos</label>
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleAddProduct(e.target.value);
+                          e.target.value = '';
+                        }
+                      }}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none font-medium"
+                    >
+                      <option value="">Selecciona un producto</option>
+                      {supplierProducts.map(product => (
+                        <option key={product.id} value={product.id}>
+                          {product.name} - Stock: {product.stock}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Items de la orden */}
+                  {orderItems.length > 0 ? (
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h4 className="font-bold text-gray-900 mb-3">Productos en la Orden ({orderItems.length})</h4>
+                      <div className="space-y-3">
+                        {orderItems.map(item => (
+                          <div key={item.productId} className="bg-white rounded-lg p-4 space-y-3">
+                            {/* Nombre del producto */}
+                            <div className="flex items-center justify-between">
+                              <div className="font-bold text-gray-900 text-lg">{item.productName}</div>
+                              <button
+                                onClick={() => handleRemoveItem(item.productId)}
+                                className="p-2 hover:bg-red-100 rounded-lg text-red-600 transition-colors"
+                              >
+                                <X className="w-5 h-5" />
+                              </button>
+                            </div>
+
+                            {/* Cantidad y Unidad */}
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-xs font-bold text-gray-600 mb-1">Cantidad</label>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={item.quantity}
+                                  onChange={(e) => handleUpdateQuantity(item.productId, parseInt(e.target.value) || 1)}
+                                  className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none text-center font-bold text-lg"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-bold text-gray-600 mb-1">Unidad</label>
+                                <select
+                                  value={item.unit}
+                                  onChange={(e) => handleUpdateUnit(item.productId, e.target.value)}
+                                  className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none font-bold"
+                                >
+                                  <option value="pieza">Pieza(s)</option>
+                                  <option value="caja">Caja(s)</option>
+                                  <option value="paquete">Paquete(s)</option>
+                                  <option value="botella">Botella(s)</option>
+                                  <option value="litro">Litro(s)</option>
+                                  <option value="kilogramo">Kilogramo(s)</option>
+                                  <option value="costal">Costal(es)</option>
+                                  <option value="garrafon">Garrafón(es)</option>
+                                  <option value="display">Display(s)</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            {/* Equivalencia opcional */}
+                            <div className="bg-blue-50 rounded-lg p-3">
+                              <label className="block text-xs font-bold text-blue-700 mb-2">
+                                Equivalencia (Opcional)
+                              </label>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-bold text-blue-900">1 {item.unit} =</span>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  placeholder="24"
+                                  value={item.unitEquivalence || ''}
+                                  onChange={(e) => handleUpdateEquivalence(
+                                    item.productId, 
+                                    parseInt(e.target.value) || 0,
+                                    item.equivalenceUnit || 'pieza'
+                                  )}
+                                  className="w-20 px-3 py-2 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-center font-bold"
+                                />
+                                <select
+                                  value={item.equivalenceUnit || 'pieza'}
+                                  onChange={(e) => handleUpdateEquivalence(
+                                    item.productId,
+                                    item.unitEquivalence || 0,
+                                    e.target.value
+                                  )}
+                                  className="flex-1 px-3 py-2 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-bold text-sm"
+                                >
+                                  <option value="pieza">pieza(s)</option>
+                                  <option value="botella">botella(s)</option>
+                                  <option value="unidad">unidad(es)</option>
+                                  <option value="lata">lata(s)</option>
+                                </select>
+                              </div>
+                              {item.unitEquivalence && item.unitEquivalence > 0 && (
+                                <div className="mt-2 text-xs font-bold text-blue-600">
+                                  Total: {item.quantity} {item.unit}(s) = {item.quantity * item.unitEquivalence} {item.equivalenceUnit}(s)
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Resumen */}
+                      <div className="mt-4 pt-4 border-t-2 border-gray-200">
+                        <div className="grid grid-cols-2 gap-4 mb-3">
+                          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border-2 border-purple-200">
+                            <p className="text-xs font-bold text-purple-700 uppercase mb-1">Total de productos</p>
+                            <p className="text-3xl font-bold text-purple-900">{orderItems.length}</p>
+                          </div>
+                          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border-2 border-green-200">
+                            <p className="text-xs font-bold text-green-700 uppercase mb-1">Total de unidades</p>
+                            <p className="text-3xl font-bold text-green-900">{getTotalItems()}</p>
+                          </div>
+                        </div>
+                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                          <p className="text-xs font-bold text-blue-700 text-center">
+                            💡 Los costos se registrarán al recibir la mercancía
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <Package className="w-20 h-20 text-gray-300 mb-4" />
+                      <p className="text-lg font-bold text-gray-900 mb-2">Sin productos</p>
+                      <p className="text-sm text-gray-500">Selecciona productos de la lista de arriba</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Botones de navegación */}
+            <div className="p-6 bg-gray-50 rounded-b-2xl border-t-2 border-gray-200">
+              <div className="flex gap-3">
+                {currentStep === 1 ? (
+                  <>
+                    <button
+                      onClick={handleCloseModal}
+                      className="flex-1 px-6 py-3.5 bg-white hover:bg-gray-100 text-gray-700 rounded-xl font-bold transition-colors border-2 border-gray-200"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleNextStep}
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-[#EC0000] to-[#D50000] hover:from-[#D50000] hover:to-[#C00000] text-white rounded-xl font-bold shadow-lg shadow-red-500/30 transition-all active:scale-95"
+                    >
+                      Siguiente
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={handlePreviousStep}
+                      className="px-6 py-3.5 bg-white hover:bg-gray-100 text-gray-700 rounded-xl font-bold transition-colors border-2 border-gray-200 flex items-center gap-2"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                      Anterior
+                    </button>
+                    <button
+                      onClick={handleCreateOrder}
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl font-bold shadow-lg shadow-green-500/30 transition-all active:scale-95"
+                    >
+                      <Save className="w-5 h-5" />
+                      Crear Orden
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
