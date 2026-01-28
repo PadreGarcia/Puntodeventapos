@@ -253,8 +253,8 @@ export function SuppliersTab({ suppliers, onUpdateSuppliers, products, onUpdateP
                       </button>
                     </div>
 
-                    {/* Teléfono y RFC - Dos columnas */}
-                    <div className="grid grid-cols-2 gap-3">
+                    {/* Teléfono y RFC - Dos columnas (Oculto en móvil) */}
+                    <div className="hidden md:grid grid-cols-2 gap-3">
                       {/* Teléfono */}
                       <div className="flex items-center gap-2 bg-green-50/50 rounded-xl p-3 border border-green-100">
                         <div className="flex-shrink-0 w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
