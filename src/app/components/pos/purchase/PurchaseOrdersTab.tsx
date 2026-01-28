@@ -231,13 +231,13 @@ export function PurchaseOrdersTab({
     ? products.filter(p => p.supplierId === selectedSupplier)
     : [];
 
-  // Componente de Card de Orden
+  // Componente de Card de Orden - Diseño simplificado estilo Recepciones
   const OrderCard = ({ order }: { order: PurchaseOrder }) => {
     const totalUnits = order.items.reduce((sum, item) => sum + item.quantity, 0);
     
     return (
       <div className="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-[#EC0000]/30">
-        {/* Header con gradiente */}
+        {/* Header con gradiente rojo Santander */}
         <div className="relative bg-gradient-to-br from-[#EC0000] to-[#C00000] p-5 overflow-hidden">
           {/* Patrón decorativo */}
           <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -265,9 +265,8 @@ export function PurchaseOrdersTab({
 
         {/* Content */}
         <div className="p-5">
-          {/* Info de la orden */}
-          <div className="space-y-3 mb-4">
-            {/* Fecha de creación */}
+          {/* Fecha de creación */}
+          <div className="mb-3">
             <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
               <div className="flex-shrink-0 w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center">
                 <Clock className="w-4 h-4 text-gray-600" />
@@ -277,62 +276,60 @@ export function PurchaseOrdersTab({
                 <p className="text-sm text-gray-900 font-medium">{formatDate(order.createdAt)}</p>
               </div>
             </div>
+          </div>
 
-            {/* Items y Unidades - Dos columnas */}
-            <div className="grid grid-cols-2 gap-3">
-              {/* Items */}
-              <div className="flex items-center gap-2 bg-blue-50/50 rounded-xl p-3 border border-blue-100">
-                <div className="flex-shrink-0 w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Package className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-blue-600 font-bold uppercase mb-0.5">Items</p>
-                  <p className="text-lg text-gray-900 font-bold">{order.items.length}</p>
-                </div>
+          {/* Items y Unidades - Grid dos columnas */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            {/* Items */}
+            <div className="flex items-center gap-2 bg-blue-50/50 rounded-xl p-3 border border-blue-100">
+              <div className="flex-shrink-0 w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Package className="w-4 h-4 text-blue-600" />
               </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-blue-600 font-bold uppercase mb-0.5">Items</p>
+                <p className="text-lg text-gray-900 font-bold">{order.items.length}</p>
+              </div>
+            </div>
 
-              {/* Unidades */}
-              <div className="flex items-center gap-2 bg-green-50/50 rounded-xl p-3 border border-green-100">
-                <div className="flex-shrink-0 w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-green-600 font-bold uppercase mb-0.5">Unidades</p>
-                  <p className="text-lg text-gray-900 font-bold">{totalUnits}</p>
-                </div>
+            {/* Unidades */}
+            <div className="flex items-center gap-2 bg-green-50/50 rounded-xl p-3 border border-green-100">
+              <div className="flex-shrink-0 w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-green-600 font-bold uppercase mb-0.5">Unidades</p>
+                <p className="text-lg text-gray-900 font-bold">{totalUnits}</p>
               </div>
             </div>
           </div>
 
-          {/* Footer con botones de acción */}
-          <div className="pt-4 border-t-2 border-gray-100">
-            <div className="flex flex-col gap-2">
+          {/* Botones de acción - Sin border-top */}
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => handleViewOrder(order)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-blue-500/30"
+            >
+              <Eye className="w-5 h-5" />
+              Ver Detalles
+            </button>
+            {order.status === 'draft' && (
               <button
-                onClick={() => handleViewOrder(order)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-blue-500/30"
+                onClick={() => handleSendOrder(order)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-green-500/30"
               >
-                <Eye className="w-4 h-4" />
-                Ver Detalles
+                <Send className="w-5 h-5" />
+                Enviar a Proveedor
               </button>
-              {order.status === 'draft' && (
-                <button
-                  onClick={() => handleSendOrder(order)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-green-500/30"
-                >
-                  <Send className="w-4 h-4" />
-                  Enviar a Proveedor
-                </button>
-              )}
-              {(order.status === 'draft' || order.status === 'sent') && (
-                <button
-                  onClick={() => handleCancelOrder(order)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl font-bold transition-all active:scale-95"
-                >
-                  <XCircle className="w-4 h-4" />
-                  Cancelar Orden
-                </button>
-              )}
-            </div>
+            )}
+            {(order.status === 'draft' || order.status === 'sent') && (
+              <button
+                onClick={() => handleCancelOrder(order)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl font-bold transition-all active:scale-95"
+              >
+                <XCircle className="w-5 h-5" />
+                Cancelar Orden
+              </button>
+            )}
           </div>
         </div>
       </div>
