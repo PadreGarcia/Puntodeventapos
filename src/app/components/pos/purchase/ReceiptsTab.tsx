@@ -109,21 +109,26 @@ export function ReceiptsTab({
 
     const receiptNumber = `REC-${Date.now().toString().slice(-8)}`;
 
-    // Crear el recibo (sin id, el backend lo genera)
+    // Crear el recibo con los nombres de campos correctos para el backend
     const newReceipt = {
       receiptNumber,
       purchaseOrderId: selectedOrder.id,
       purchaseOrderNumber: selectedOrder.orderNumber,
       supplierId: selectedOrder.supplierId,
       supplierName: selectedOrder.supplierName,
-      items: receivedItems.map(item => ({
-        productId: item.productId,
-        productName: item.productName,
-        orderedQuantity: item.orderedQuantity,
-        receivedQuantity: item.receivedQuantity,
-        unitCost: item.unitCost || 0,
-        isComplete: item.isComplete
-      })),
+      items: receivedItems.map(item => {
+        const unitCost = item.unitCost || 0;
+        const total = unitCost * item.receivedQuantity;
+        return {
+          productId: item.productId,
+          productName: item.productName,
+          quantityOrdered: item.orderedQuantity,      // Backend usa quantityOrdered
+          quantityReceived: item.receivedQuantity,    // Backend usa quantityReceived
+          unitCost: unitCost,
+          total: total,                               // Campo calculado requerido
+          isComplete: item.isComplete
+        };
+      }),
       receivedAt: new Date().toISOString(),
       receivedBy: 'Usuario',
       notes: notes || '',
