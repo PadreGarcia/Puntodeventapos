@@ -1102,26 +1102,6 @@ export function ProductManagement({
                       />
                     </div>
 
-                    {/* Stock Inicial */}
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
-                        Stock Inicial *
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        min="0"
-                        value={formData.stock}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            stock: parseInt(e.target.value) || 0,
-                          })
-                        }
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all font-medium"
-                        placeholder="0"
-                      />
-                    </div>
                   </div>
 
                   {/* URL de imagen */}
@@ -1141,31 +1121,6 @@ export function ProductManagement({
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all font-medium"
                       placeholder="https://..."
                     />
-                  </div>
-
-                  {/* Stock Mínimo */}
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Stock Mínimo (Punto de Reorden)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={formData.minStock || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          minStock:
-                            parseInt(e.target.value) || undefined,
-                        })
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all font-medium"
-                      placeholder="Ej: 10"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Se alertará cuando el stock llegue a este
-                      nivel
-                    </p>
                   </div>
 
                   {/* Descripción */}
