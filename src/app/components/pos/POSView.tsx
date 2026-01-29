@@ -77,12 +77,14 @@ export function POSView({ currentUser, onLogout }: POSViewProps) {
 
   // Nueva venta
   const handleNewSale = () => {
+    console.log('🔄 handleNewSale called');
     setCurrentSale(null);
     setIsConfirmationModalOpen(false);
     // Regresar foco al input de búsqueda con delay para esperar que el modal se cierre
     setTimeout(() => {
+      console.log('⏰ Timeout executed, productGridRef:', productGridRef.current);
       productGridRef.current?.focusSearchInput();
-    }, 300);
+    }, 500);
   };
 
   // Imprimir ticket
@@ -92,11 +94,13 @@ export function POSView({ currentUser, onLogout }: POSViewProps) {
 
   // Cerrar modal de pago (cancelar)
   const handleClosePaymentModal = () => {
+    console.log('❌ handleClosePaymentModal called');
     setIsPaymentModalOpen(false);
     // Regresar foco al input de búsqueda con delay para esperar que el modal se cierre
     setTimeout(() => {
+      console.log('⏰ Timeout executed (close payment), productGridRef:', productGridRef.current);
       productGridRef.current?.focusSearchInput();
-    }, 300);
+    }, 500);
   };
 
   // Calcular totales del carrito

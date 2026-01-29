@@ -26,8 +26,13 @@ export const ProductGrid = forwardRef<ProductGridRef, ProductGridProps>(({ produ
   // Exponer función para enfocar el input desde el componente padre
   useImperativeHandle(ref, () => ({
     focusSearchInput: () => {
+      console.log('🎯 focusSearchInput called');
       if (searchInputRef.current) {
+        console.log('✅ searchInputRef exists, calling focus()');
         searchInputRef.current.focus();
+        console.log('📍 Active element:', document.activeElement);
+      } else {
+        console.log('❌ searchInputRef is null');
       }
     }
   }));
@@ -167,3 +172,5 @@ export const ProductGrid = forwardRef<ProductGridRef, ProductGridProps>(({ produ
     </div>
   );
 });
+
+ProductGrid.displayName = 'ProductGrid';
