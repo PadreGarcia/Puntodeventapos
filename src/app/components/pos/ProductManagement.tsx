@@ -551,7 +551,7 @@ export function ProductManagement({
                     e.stopPropagation();
                     onEdit(product);
                   }}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 bg-blue-50 text-blue-700 hover:bg-blue-100 active:scale-95 rounded-lg font-semibold text-sm transition-all pointer-events-auto relative z-20"
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white active:scale-95 rounded-lg font-bold text-sm transition-all pointer-events-auto relative z-20 shadow-md hover:shadow-lg"
                   title="Editar Producto"
                 >
                   <Edit2 className="w-4 h-4" />
@@ -566,7 +566,7 @@ export function ProductManagement({
                     e.stopPropagation();
                     onDelete(product.id);
                   }}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 bg-red-50 text-red-700 hover:bg-red-100 active:scale-95 rounded-lg font-semibold text-sm transition-all pointer-events-auto relative z-20"
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white active:scale-95 rounded-lg font-bold text-sm transition-all pointer-events-auto relative z-20 shadow-md hover:shadow-lg"
                   title="Eliminar Producto"
                 >
                   <Trash2 className="w-4 h-4" />
