@@ -43,10 +43,6 @@ export function POSView({ currentUser, onLogout }: POSViewProps) {
     if (product) {
       if (product.stock > 0) {
         addToCart(product);
-        toast.success(`${product.name} agregado al carrito`, {
-          duration: 2000,
-          position: 'top-center',
-        });
       } else {
         toast.error(`${product.name} sin stock disponible`, {
           duration: 3000,

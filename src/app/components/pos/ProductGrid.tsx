@@ -39,6 +39,17 @@ export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
     return matchesSearch && matchesCategory;
   });
 
+  // Agregar producto al carrito y regresar el foco al input
+  const handleAddToCart = (product: Product) => {
+    onAddToCart(product);
+    // Regresar foco al input de búsqueda
+    setTimeout(() => {
+      if (searchInputRef.current) {
+        searchInputRef.current.focus();
+      }
+    }, 0);
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Barra de búsqueda y filtros */}
@@ -90,7 +101,7 @@ export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
             {filteredProducts.map((product, index) => (
               <button
                 key={`product-${product.id}-${index}`}
-                onClick={() => onAddToCart(product)}
+                onClick={() => handleAddToCart(product)}
                 disabled={product.stock === 0}
                 className={`group relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col min-h-[180px] pointer-events-auto ${
                   product.stock === 0 
