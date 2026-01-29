@@ -862,11 +862,9 @@ export function PurchaseOrdersTab({
       {viewOrder && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            {/* Header rojo */}
             <div className="bg-gradient-to-r from-[#EC0000] to-[#D50000] text-white p-6 flex items-center justify-between sticky top-0">
-              <div>
-                <h3 className="text-2xl font-bold">{viewOrder.orderNumber}</h3>
-                <p className="text-red-100 mt-1">{viewOrder.supplierName}</p>
-              </div>
+              <h3 className="text-2xl font-bold">{viewOrder.supplierName}</h3>
               <button
                 onClick={handleCloseModal}
                 className="p-2.5 hover:bg-white/15 rounded-xl transition-colors"
@@ -875,70 +873,63 @@ export function PurchaseOrdersTab({
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
-              {/* Estado y fecha */}
-              <div className="flex items-center justify-between">
-                {getStatusBadge(viewOrder.status)}
-                <div className="text-sm text-gray-600">
-                  <span className="font-bold">Creada:</span> {formatDate(viewOrder.createdAt)}
-                </div>
-              </div>
-
-              {/* Items */}
+            <div className="p-6 space-y-4">
+              {/* Número de orden */}
               <div>
-                <h4 className="font-bold text-gray-900 mb-3">Productos</h4>
-                <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-                  {viewOrder.items.map(item => (
-                    <div key={item.productId} className="bg-white rounded-lg p-4">
-                      <div className="font-bold text-gray-900 text-lg mb-3">{item.productName}</div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-blue-50 rounded-lg p-3">
-                          <div className="text-xs text-blue-600 font-bold uppercase mb-1">Cantidad</div>
-                          <div className="text-2xl font-bold text-blue-900">{item.quantity}</div>
-                          <div className="text-xs text-blue-600">{item.unit}</div>
-                        </div>
-                        {item.unitEquivalence && item.unitEquivalence > 0 && (
-                          <div className="bg-green-50 rounded-lg p-3">
-                            <div className="text-xs text-green-600 font-bold uppercase mb-1">Equivalencia</div>
-                            <div className="text-xl font-bold text-green-900">
-                              {item.quantity * item.unitEquivalence}
-                            </div>
-                            <div className="text-xs text-green-600">{item.equivalenceUnit}(s)</div>
-                          </div>
-                        )}
-                      </div>
-                      {item.unitEquivalence && item.unitEquivalence > 0 && (
-                        <div className="mt-3 text-sm text-gray-600 font-medium bg-gray-50 rounded-lg p-2 text-center">
-                          1 {item.unit} = {item.unitEquivalence} {item.equivalenceUnit}(s)
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                <p className="text-sm text-gray-600 font-bold">{viewOrder.orderNumber}</p>
               </div>
 
-              {/* Resumen */}
-              <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center">
-                    <div className="text-sm text-gray-600 font-bold uppercase mb-1">Productos</div>
-                    <div className="text-3xl font-bold text-gray-900">{viewOrder.items.length}</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm text-gray-600 font-bold uppercase mb-1">Unidades Totales</div>
-                    <div className="text-3xl font-bold text-[#EC0000]">
-                      {viewOrder.items.reduce((sum, item) => sum + item.quantity, 0)}
-                    </div>
-                  </div>
+              {/* Estado y fecha */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  {getStatusBadge(viewOrder.status)}
+                </div>
+                <p className="text-sm text-gray-600">
+                  Creada: {formatDate(viewOrder.createdAt)}
+                </p>
+              </div>
+
+              {/* Tabla de productos */}
+              <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gradient-to-r from-[#EC0000] to-[#D50000] text-white">
+                        <th className="px-4 py-3 text-left font-bold text-sm">#</th>
+                        <th className="px-4 py-3 text-left font-bold text-sm">Producto</th>
+                        <th className="px-4 py-3 text-center font-bold text-sm">Cantidad</th>
+                        <th className="px-4 py-3 text-center font-bold text-sm">Unidad</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {viewOrder.items.map((item, index) => (
+                        <tr key={item.productId} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-4 py-4 text-gray-600 font-bold">{index + 1}</td>
+                          <td className="px-4 py-4">
+                            <p className="font-bold text-gray-900">{item.productName}</p>
+                          </td>
+                          <td className="px-4 py-4 text-center">
+                            <span className="inline-flex items-center justify-center px-4 py-2 bg-blue-100 text-blue-900 font-bold rounded-lg">
+                              {item.quantity}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4 text-center">
+                            <span className="inline-flex items-center justify-center px-4 py-2 bg-purple-100 text-purple-900 font-bold rounded-lg capitalize">
+                              {item.unit}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
               {/* Notas */}
               {viewOrder.notes && (
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-2">Notas</h4>
-                  <p className="text-gray-700 bg-gray-50 rounded-lg p-3">{viewOrder.notes}</p>
-                </div>
+                <p className="text-sm text-gray-600 italic">
+                  Nota: {viewOrder.notes}
+                </p>
               )}
 
               {/* Acciones */}
