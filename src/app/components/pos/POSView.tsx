@@ -69,10 +69,12 @@ export function POSView({ currentUser, onLogout }: POSViewProps) {
 
   // Cuando la venta se complete exitosamente
   const handleSaleSuccess = (sale: Sale) => {
+    console.log('✅ handleSaleSuccess called with sale:', sale);
     setCurrentSale(sale);
     setIsPaymentModalOpen(false);
     setIsConfirmationModalOpen(true);
     setIsCartOpen(false);
+    console.log('🎫 ConfirmationModal should be open now');
   };
 
   // Nueva venta

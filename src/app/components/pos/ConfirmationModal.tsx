@@ -9,7 +9,12 @@ interface ConfirmationModalProps {
 }
 
 export function ConfirmationModal({ isOpen, sale, onNewSale, onPrint }: ConfirmationModalProps) {
-  if (!isOpen || !sale) return null;
+  console.log('🎫 ConfirmationModal render - isOpen:', isOpen, 'sale:', sale);
+  
+  if (!isOpen || !sale) {
+    console.log('❌ ConfirmationModal returning null - isOpen:', isOpen, 'sale:', sale);
+    return null;
+  }
 
   const paymentMethodLabels: Record<string, string> = {
     cash: 'Efectivo',
@@ -149,7 +154,10 @@ export function ConfirmationModal({ isOpen, sale, onNewSale, onPrint }: Confirma
         {/* Acciones */}
         <div className="p-6 pt-0 space-y-3">
           <button
-            onClick={onPrint}
+            onClick={() => {
+              console.log('🖨️ Imprimir Ticket clicked');
+              onPrint();
+            }}
             className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gray-700 hover:bg-gray-800 text-white rounded-xl font-bold text-lg transition-colors active:scale-95 shadow-lg"
           >
             <Printer className="w-5 h-5" />
@@ -157,7 +165,10 @@ export function ConfirmationModal({ isOpen, sale, onNewSale, onPrint }: Confirma
           </button>
 
           <button
-            onClick={onNewSale}
+            onClick={() => {
+              console.log('🔄 Nueva Venta button clicked!');
+              onNewSale();
+            }}
             className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#EC0000] to-[#D50000] hover:from-[#D50000] hover:to-[#C00000] text-white rounded-xl font-bold text-lg transition-all active:scale-95 shadow-xl hover:shadow-2xl shadow-red-500/30"
           >
             <RotateCcw className="w-5 h-5" />
