@@ -186,7 +186,6 @@ export function POSProvider({ children }: { children: ReactNode }) {
           return prevItems;
         }
         
-        toast.success(`${product.name} agregado al carrito`, { duration: 2000 });
         return [...prevItems, { product, quantity: 1 }];
       }
     });

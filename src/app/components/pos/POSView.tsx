@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePOS } from '@/app/contexts/POSContext';
 import { Header } from './Header';
-import { ProductGrid } from './ProductGrid';
+import { ProductGrid, type ProductGridRef } from './ProductGrid';
 import { Cart } from './Cart';
 import { FloatingCartButton } from './FloatingCartButton';
 import { PaymentModalWithAPI } from './PaymentModalWithAPI';
@@ -30,6 +30,7 @@ export function POSView({ currentUser, onLogout }: POSViewProps) {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [currentSale, setCurrentSale] = useState<Sale | null>(null);
+  const productGridRef = useRef<ProductGridRef>(null);
 
   // Cargar productos al montar
   useEffect(() => {
@@ -78,6 +79,19 @@ export function POSView({ currentUser, onLogout }: POSViewProps) {
   const handleNewSale = () => {
     setCurrentSale(null);
     setIsConfirmationModalOpen(false);
+    // Regresar foco al input de búsqueda
+    setTimeout(() => {
+      productGridRef.current?.focusSearchInput();
+    }, 100);
+  };
+
+  // Cerrar modal de pago (cancelar)
+  const handleClosePaymentModal = () => {
+    setIsPaymentModalOpen(false);
+    // Regresar foco al input de búsqueda
+    setTimeout(() => {
+      productGridRef.current?.focusSearchInput();
+    }, 100);
   };
 
   // Calcular totales del carrito
@@ -110,6 +124,7 @@ export function POSView({ currentUser, onLogout }: POSViewProps) {
             </div>
           ) : (
             <ProductGrid 
+              ref={productGridRef}
               products={products}
               onAddToCart={addToCart}
             />
@@ -164,7 +179,7 @@ export function POSView({ currentUser, onLogout }: POSViewProps) {
       {/* Modal de Pago */}
       <PaymentModalWithAPI
         isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
+        onClose={handleClosePaymentModal}
         onSuccess={handleSaleSuccess}
         TAX_RATE={TAX_RATE}
       />

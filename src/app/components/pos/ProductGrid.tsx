@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { Search, Plus, Package, Filter } from 'lucide-react';
 import type { Product } from '@/types/pos';
 
@@ -7,7 +7,11 @@ interface ProductGridProps {
   onAddToCart: (product: Product) => void;
 }
 
-export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
+export interface ProductGridRef {
+  focusSearchInput: () => void;
+}
+
+export const ProductGrid = forwardRef<ProductGridRef, ProductGridProps>(({ products, onAddToCart }, ref) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -18,6 +22,15 @@ export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
       searchInputRef.current.focus();
     }
   }, []);
+
+  // Exponer función para enfocar el input desde el componente padre
+  useImperativeHandle(ref, () => ({
+    focusSearchInput: () => {
+      if (searchInputRef.current) {
+        searchInputRef.current.focus();
+      }
+    }
+  }));
 
   // Obtener categorías únicas (sin duplicar 'all')
   const uniqueCategories = Array.from(
@@ -153,4 +166,4 @@ export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
       </div>
     </div>
   );
-}
+});
