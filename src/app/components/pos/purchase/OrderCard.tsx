@@ -111,9 +111,10 @@ export function OrderCard({
             {(order.status === 'draft' || order.status === 'sent') && (
               <button
                 onClick={() => onCancelOrder(order)}
-                className="px-4 py-2.5 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl font-bold transition-all active:scale-95"
+                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-red-500/30"
               >
                 <XCircle className="w-4 h-4" />
+                Cancelar Orden
               </button>
             )}
           </div>

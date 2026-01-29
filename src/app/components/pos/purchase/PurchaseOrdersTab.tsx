@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { purchaseService } from '@/services';
 import type { PurchaseOrder, PurchaseOrderItem, Supplier, Product, PurchaseOrderStatus } from '@/types/pos';
 import { OrderCard } from './OrderCard';
+import { CancelOrderModal } from './CancelOrderModal';
 
 interface PurchaseOrdersTabProps {
   purchaseOrders: PurchaseOrder[];
@@ -29,6 +30,10 @@ export function PurchaseOrdersTab({
   const [productSearch, setProductSearch] = useState('');
   const [showProductSuggestions, setShowProductSuggestions] = useState(false);
   const productSearchRef = useRef<HTMLDivElement>(null);
+  
+  // Estado para el modal de cancelación
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [orderToCancel, setOrderToCancel] = useState<PurchaseOrder | null>(null);
 
   // Cerrar sugerencias al hacer clic fuera
   useEffect(() => {
@@ -215,24 +220,38 @@ export function PurchaseOrdersTab({
   };
 
   const handleCancelOrder = async (order: PurchaseOrder) => {
-    if (window.confirm(`¿Cancelar la orden ${order.orderNumber}?`)) {
-      try {
-        await purchaseService.updatePurchaseOrderStatus(order.id, 'cancelled');
-        
-        const updated = purchaseOrders.map(o =>
-          o.id === order.id
-            ? { ...o, status: 'cancelled' as PurchaseOrderStatus }
-            : o
-        );
-        onUpdatePurchaseOrders(updated);
-        toast.success(`Orden ${order.orderNumber} cancelada`);
-      } catch (error: any) {
-        console.error('Error al cancelar orden:', error);
-        if (error.message?.includes('permisos')) {
-          toast.error('No tienes permisos para cancelar órdenes. Contacta al administrador.');
-        } else {
-          toast.error(error.message || 'Error al cancelar la orden');
-        }
+    setOrderToCancel(order);
+    setShowCancelModal(true);
+  };
+
+  const confirmCancelOrder = async () => {
+    if (!orderToCancel) return;
+    
+    try {
+      await purchaseService.updatePurchaseOrderStatus(orderToCancel.id, 'cancelled');
+      
+      const updated = purchaseOrders.map(o =>
+        o.id === orderToCancel.id
+          ? { ...o, status: 'cancelled' as PurchaseOrderStatus }
+          : o
+      );
+      onUpdatePurchaseOrders(updated);
+      toast.success(`Orden ${orderToCancel.orderNumber} cancelada`);
+      
+      // Cerrar el modal de cancelación
+      setShowCancelModal(false);
+      setOrderToCancel(null);
+      
+      // Si estamos viendo el detalle de la orden cancelada, cerrar también ese modal
+      if (viewOrder?.id === orderToCancel.id) {
+        handleCloseModal();
+      }
+    } catch (error: any) {
+      console.error('Error al cancelar orden:', error);
+      if (error.message?.includes('permisos')) {
+        toast.error('No tienes permisos para cancelar órdenes. Contacta al administrador.');
+      } else {
+        toast.error(error.message || 'Error al cancelar la orden');
       }
     }
   };
@@ -959,6 +978,17 @@ export function PurchaseOrdersTab({
           </div>
         </div>
       )}
+
+      {/* Modal de confirmación de cancelación */}
+      <CancelOrderModal
+        isOpen={showCancelModal}
+        order={orderToCancel}
+        onConfirm={confirmCancelOrder}
+        onCancel={() => {
+          setShowCancelModal(false);
+          setOrderToCancel(null);
+        }}
+      />
     </div>
   );
 }
