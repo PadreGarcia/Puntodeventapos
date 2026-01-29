@@ -502,14 +502,12 @@ export function ProductManagement({
             </div>
 
             {/* Proveedor */}
-            {product.supplierName && (
-              <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-2 py-1.5 rounded-lg">
-                <Building2 className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate font-medium">
-                  {product.supplierName}
-                </span>
-              </div>
-            )}
+            <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-2 py-1.5 rounded-lg">
+              <Building2 className="w-4 h-4 flex-shrink-0" />
+              <span className={`truncate font-medium ${!product.supplierName ? 'italic text-gray-400' : ''}`}>
+                {product.supplierName || 'No proporcionado'}
+              </span>
+            </div>
 
             {/* Código de barras con acciones */}
             {product.barcode && (
