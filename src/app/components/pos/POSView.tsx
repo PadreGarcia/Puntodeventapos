@@ -80,13 +80,26 @@ export function POSView({ currentUser, onLogout }: POSViewProps) {
   // Nueva venta
   const handleNewSale = () => {
     console.log('🔄 handleNewSale called');
+    setCartItems([]);
     setCurrentSale(null);
     setIsConfirmationModalOpen(false);
-    // Regresar foco al input de búsqueda con delay para esperar que el modal se cierre
-    setTimeout(() => {
-      console.log('⏰ Timeout executed, productGridRef:', productGridRef.current);
-      productGridRef.current?.focusSearchInput();
-    }, 500);
+    setIsCartOpen(false);
+    
+    console.log('⏱️ Setting timeout for focus...');
+    // Usar requestAnimationFrame y luego setTimeout para asegurar que el foco se aplique después de que React actualice el DOM
+    requestAnimationFrame(() => {
+      console.log('🎬 requestAnimationFrame executed');
+      setTimeout(() => {
+        console.log('⏰ Timeout executed, productGridRef:', productGridRef.current);
+        console.log('📋 Current document.activeElement:', document.activeElement);
+        if (productGridRef.current) {
+          console.log('✅ productGridRef exists, calling focusSearchInput');
+          productGridRef.current.focusSearchInput();
+        } else {
+          console.log('❌ productGridRef.current is null');
+        }
+      }, 300);
+    });
   };
 
   // Imprimir ticket
