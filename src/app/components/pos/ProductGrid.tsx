@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, Plus, Package, Filter } from 'lucide-react';
 import type { Product } from '@/types/pos';
 
@@ -10,6 +10,14 @@ interface ProductGridProps {
 export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Autofocus en el campo de búsqueda cuando el componente se monta
+  useEffect(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, []);
 
   // Obtener categorías únicas (sin duplicar 'all')
   const uniqueCategories = Array.from(
@@ -21,9 +29,12 @@ export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
   );
   const categories = ['all', ...uniqueCategories];
 
-  // Filtrar productos
+  // Filtrar productos por nombre o código de barras
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchLower = searchTerm.toLowerCase().trim();
+    const matchesSearch = 
+      product.name.toLowerCase().includes(searchLower) ||
+      (product.barcode && product.barcode.toLowerCase().includes(searchLower));
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -37,8 +48,9 @@ export function ProductGrid({ products, onAddToCart }: ProductGridProps) {
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
+              ref={searchInputRef}
               type="text"
-              placeholder="Buscar productos..."
+              placeholder="Buscar por nombre o código..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EC0000] focus:border-[#EC0000] outline-none transition-all text-base font-medium"
