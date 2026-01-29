@@ -863,8 +863,11 @@ export function PurchaseOrdersTab({
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             {/* Header rojo */}
-            <div className="bg-gradient-to-r from-[#EC0000] to-[#D50000] text-white p-6 flex items-center justify-between sticky top-0">
-              <h3 className="text-2xl font-bold">{viewOrder.supplierName}</h3>
+            <div className="bg-gradient-to-r from-[#EC0000] to-[#D50000] text-white p-6 flex items-start justify-between sticky top-0">
+              <div>
+                <h3 className="text-2xl font-bold">{viewOrder.supplierName}</h3>
+                <p className="text-red-100 mt-1 text-sm">{viewOrder.orderNumber}</p>
+              </div>
               <button
                 onClick={handleCloseModal}
                 className="p-2.5 hover:bg-white/15 rounded-xl transition-colors"
@@ -874,16 +877,9 @@ export function PurchaseOrdersTab({
             </div>
 
             <div className="p-6 space-y-4">
-              {/* Número de orden */}
-              <div>
-                <p className="text-sm text-gray-600 font-bold">{viewOrder.orderNumber}</p>
-              </div>
-
               {/* Estado y fecha */}
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  {getStatusBadge(viewOrder.status)}
-                </div>
+              <div className="flex items-center justify-between">
+                {getStatusBadge(viewOrder.status)}
                 <p className="text-sm text-gray-600">
                   Creada: {formatDate(viewOrder.createdAt)}
                 </p>
