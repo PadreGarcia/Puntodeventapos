@@ -167,7 +167,10 @@ export function ConfirmationModal({ isOpen, sale, onNewSale, onPrint }: Confirma
           <button
             onClick={() => {
               console.log('🔄 Nueva Venta button clicked!');
+              console.log('🔄 onNewSale function:', onNewSale);
+              console.log('🔄 Calling onNewSale now...');
               onNewSale();
+              console.log('✅ onNewSale executed successfully');
             }}
             className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#EC0000] to-[#D50000] hover:from-[#D50000] hover:to-[#C00000] text-white rounded-xl font-bold text-lg transition-all active:scale-95 shadow-xl hover:shadow-2xl shadow-red-500/30"
           >
