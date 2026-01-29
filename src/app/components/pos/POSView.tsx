@@ -79,19 +79,24 @@ export function POSView({ currentUser, onLogout }: POSViewProps) {
   const handleNewSale = () => {
     setCurrentSale(null);
     setIsConfirmationModalOpen(false);
-    // Regresar foco al input de búsqueda
+    // Regresar foco al input de búsqueda con delay para esperar que el modal se cierre
     setTimeout(() => {
       productGridRef.current?.focusSearchInput();
-    }, 100);
+    }, 300);
+  };
+
+  // Imprimir ticket
+  const handlePrintTicket = () => {
+    window.print();
   };
 
   // Cerrar modal de pago (cancelar)
   const handleClosePaymentModal = () => {
     setIsPaymentModalOpen(false);
-    // Regresar foco al input de búsqueda
+    // Regresar foco al input de búsqueda con delay para esperar que el modal se cierre
     setTimeout(() => {
       productGridRef.current?.focusSearchInput();
-    }, 100);
+    }, 300);
   };
 
   // Calcular totales del carrito
@@ -189,7 +194,8 @@ export function POSView({ currentUser, onLogout }: POSViewProps) {
         <ConfirmationModal
           isOpen={isConfirmationModalOpen}
           sale={currentSale}
-          onClose={handleNewSale}
+          onNewSale={handleNewSale}
+          onPrint={handlePrintTicket}
         />
       )}
     </div>
